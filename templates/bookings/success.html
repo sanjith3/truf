@@ -22,9 +22,8 @@
             </div>
             <div>
                 <p class="text-xs text-gray-500 font-bold uppercase tracking-widest">Date & Time</p>
-                <p class="text-lg font-bold text-gray-900">
-                    {{ booking.booking_date|date:"M j, Y" }} | {{ booking.start_time|time:"H:i" }}
-                </p>
+                <p class="text-lg font-bold text-gray-900">{{ booking.booking_date|date:"M j, Y" }} | {{
+                    booking.start_time|time:"H:i" }}</p>
             </div>
         </div>
 

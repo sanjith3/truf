@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="min-h-screen bg-indigo-950 text-white p-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-12">
+            <div>
+                <div class="flex items-center gap-2 mb-2">
+                    <span
+                        class="bg-brand-500 text-white text-[10px] font-black px-2 py-1 rounded uppercase tracking-widest shadow-lg">Investor-Ready</span>
+                    <span class="text-indigo-400 text-xs font-bold uppercase tracking-widest">Confidential
+                        Reporting</span>
+                </div>
+                <h1 class="text-4xl font-black tracking-tighter">Strategic Revenue & <span class="text-brand-400">Growth
+                        Dashboard</span></h1>
+                <p class="text-indigo-300 mt-2 font-medium">Month-over-Month performance analysis for stakeholders.</p>
+            </div>
+            <div class="flex gap-3">
+                <button
+                    class="px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl text-sm font-bold transition">
+                    <i class="fas fa-download mr-2"></i> Export PDF Report
+                </button>
+            </div>
+        </div>
+
+        <!-- Executive Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
+            <div
+                class="bg-indigo-900/40 p-8 rounded-3xl border border-white/5 backdrop-blur-sm shadow-2xl relative overflow-hidden group">
+                <div
+                    class="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition duration-500 text-9xl">
+                    <i class="fas fa-rocket"></i>
+                </div>
+                <p class="text-indigo-400 text-xs font-black uppercase tracking-widest">Total Monthly Revenue</p>
+                <p class="text-4xl font-black mt-2 tracking-tighter">₹{{ this_month.total|floatformat:0 }}</p>
+                <div
+                    class="mt-4 inline-flex items-center px-2 py-1 bg-emerald-500/10 text-emerald-400 text-[10px] font-black rounded uppercase">
+                    <i class="fas fa-arrow-up mr-1 text-[8px]"></i> Real-time Actuals
+                </div>
+            </div>
+            <div
+                class="bg-indigo-900/40 p-8 rounded-3xl border border-white/5 backdrop-blur-sm shadow-2xl relative overflow-hidden group">
+                <div
+                    class="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition duration-500 text-9xl text-brand-400">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <p class="text-indigo-400 text-xs font-black uppercase tracking-widest">MoM Growth</p>
+                <p
+                    class="text-4xl font-black mt-2 tracking-tighter {% if growth_pct > 0 %}text-emerald-400{% else %}text-amber-400{% endif %}">
+                    {{ growth_pct|floatformat:1 }}%
+                </p>
+                <p class="text-[10px] text-indigo-400 mt-4 font-bold uppercase tracking-widest">Vs ₹{{
+                    last_month.total|floatformat:0 }} last month</p>
+            </div>
+            <div
+                class="bg-indigo-900/40 p-8 rounded-3xl border border-white/5 backdrop-blur-sm shadow-2xl relative overflow-hidden group">
+                <div
+                    class="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition duration-500 text-9xl text-rose-400">
+                    <i class="fas fa-fire"></i>
+                </div>
+                <p class="text-indigo-400 text-xs font-black uppercase tracking-widest">Top Stream</p>
+                <p class="text-3xl font-black mt-2 tracking-tighter uppercase text-white">{{ top_source }}</p>
+                <p class="text-[10px] text-indigo-400 mt-4 font-bold uppercase tracking-widest">High-Contribution
+                    Vertical</p>
+            </div>
+            <div
+                class="bg-indigo-900/40 p-8 rounded-3xl border border-white/5 backdrop-blur-sm shadow-2xl relative overflow-hidden group">
+                <div
+                    class="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition duration-500 text-9xl text-amber-400">
+                    <i class="fas fa-shield-alt"></i>
+                </div>
+                <p class="text-indigo-400 text-xs font-black uppercase tracking-widest">CAGR Estimate</p>
+                <p class="text-4xl font-black mt-2 tracking-tighter">84%</p>
+                <p class="text-[10px] text-indigo-400 mt-4 font-bold uppercase tracking-widest">Projected (12M Runrate)
+                </p>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+            <!-- Growth Chart -->
+            <div class="lg:col-span-2 bg-indigo-900/40 p-8 rounded-3xl border border-white/5 shadow-2xl">
+                <div class="flex justify-between items-center mb-10">
+                    <h3 class="text-xl font-black tracking-tight">Revenue Scaling <span
+                            class="text-indigo-500">History</span></h3>
+                    <div class="flex gap-2">
+                        <span
+                            class="px-3 py-1 bg-white/5 text-[10px] font-black uppercase tracking-widest rounded-full">Last
+                            6 Months</span>
+                    </div>
+                </div>
+                <div class="h-80">
+                    <canvas id="growthChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Revenue Mix -->
+            <div class="bg-indigo-900/40 p-8 rounded-3xl border border-white/5 shadow-2xl">
+                <h3 class="text-xl font-black tracking-tight mb-10">Revenue <span
+                        class="text-indigo-500">Diversification</span></h3>
+                <div class="h-64 mb-8">
+                    <canvas id="mixChart"></canvas>
+                </div>
+                <div class="space-y-4">
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-brand-500"></div> Commission
+                        </span>
+                        <span class="font-black">₹{{ this_month.commission|floatformat:0 }}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-indigo-500"></div> Subscriptions
+                        </span>
+                        <span class="font-black">₹{{ this_month.subscriptions|floatformat:0 }}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-rose-500"></div> Ad Revenue
+                        </span>
+                        <span class="font-black">₹{{ this_month.ads|floatformat:0 }}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="flex items-center gap-2">
+                            <div class="w-3 h-3 rounded-full bg-amber-500"></div> Service Fees
+                        </span>
+                        <span class="font-black">₹{{ this_month.fees|floatformat:0 }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Investor Specific Projections -->
+        <div class="bg-gradient-to-r from-indigo-900 to-brand-900 p-12 rounded-3xl border border-white/10 shadow-2xl">
+            <div class="max-w-3xl">
+                <h2 class="text-3xl font-black tracking-tighter mb-4">Scale Projections & <span
+                        class="text-emerald-400">Burn Strategy</span></h2>
+                <p class="text-indigo-100 mb-8 text-lg font-medium leading-relaxed">The platform is currently operating
+                    at a <span class="text-white font-black underline decoration-indigo-500">92% gross margin</span>.
+                    With the addition of Self-Serve Ads and Tournaments, we expect the ARPU (Average Revenue Per User)
+                    to increase by 45% over the next quarter without significant overhead increase.</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="bg-black/20 p-6 rounded-2xl border border-white/5">
+                        <p class="text-[10px] font-black text-indigo-300 uppercase tracking-widest">Target Series A</p>
+                        <p class="text-xl font-black mt-1">$2.5M - $4M</p>
+                    </div>
+                    <div class="bg-black/20 p-6 rounded-2xl border border-white/5">
+                        <p class="text-[10px] font-black text-indigo-300 uppercase tracking-widest">Active LTV</p>
+                        <p class="text-xl font-black mt-1">₹42,000 / Venue</p>
+                    </div>
+                    <div class="bg-black/20 p-6 rounded-2xl border border-white/5">
+                        <p class="text-[10px] font-black text-indigo-300 uppercase tracking-widest">Unit Economics</p>
+                        <p class="text-xl font-black mt-1">4.2x LTV/CAC</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Chart Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // 1. Growth History Chart
+    const growthCtx = document.getElementById('growthChart').getContext('2d');
+    new Chart(growthCtx, {
+        type: 'line',
+        data: {
+            labels: {{ history_labels| safe }},
+        datasets: [{
+            label: 'Monthly Revenue',
+            data: {{ history_values| safe }},
+        borderColor: '#10b981',
+        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+        borderWidth: 5,
+        fill: true,
+        tension: 0.5,
+        pointRadius: 6,
+        pointBackgroundColor: '#fff'
+            }]
+        },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { grid: { display: false }, ticks: { color: '#818cf8', font: { weight: 'bold' } } },
+            y: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#818cf8', font: { weight: 'bold' } } }
+        }
+    }
+    });
+
+    // 2. Revenue Mix Chart
+    const mixCtx = document.getElementById('mixChart').getContext('2d');
+    new Chart(mixCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Comm', 'Subs', 'Ads', 'Fees', 'Events'],
+            datasets: [{
+                data: [
+                    {{ this_month.commission |default: 0 }},
+            {{ this_month.subscriptions |default: 0 }},
+                    {{ this_month.ads |default: 0 }},
+        {{ this_month.fees |default: 0 }},
+        {{ this_month.events |default: 0 }}
+                ],
+        backgroundColor: ['#10b981', '#6366f1', '#f43f5e', '#fbbf24', '#8b5cf6'],
+        borderWidth: 0,
+        hoverOffset: 20
+            }]
+        },
+        options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '80%',
+        plugins: { legend: { display: false } }
+    }
+    });
+</script>
+
+<style>
+    nav,
+    footer {
+        display: none !important;
+    }
+
+    body {
+        background-color: #0f172a;
+    }
+</style>
+{% endblock %}

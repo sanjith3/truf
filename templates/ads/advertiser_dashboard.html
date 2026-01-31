@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="min-h-screen bg-gray-50/50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-12">
+            <div>
+                <h1 class="text-4xl font-black text-gray-900 tracking-tight">Advertiser Command <span
+                        class="text-rose-600">Center</span></h1>
+                <p class="text-gray-500 mt-2 font-medium">Manage your brand presence and tracking performance.</p>
+            </div>
+            <div>
+                <a href="{% url 'ads:create' %}"
+                    class="inline-flex items-center px-8 py-4 bg-rose-600 hover:bg-rose-700 text-white font-bold rounded-2xl shadow-xl shadow-rose-200 transition transform hover:-translate-y-1">
+                    <i class="fas fa-plus-circle mr-2"></i> Launch New Campaign
+                </a>
+            </div>
+        </div>
+
+        <!-- Performance Stats Overview -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden group">
+                <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition duration-500">
+                    <i class="fas fa-wallet text-9xl"></i>
+                </div>
+                <p class="text-gray-400 text-xs font-black uppercase tracking-widest mb-1">Total Ad Spend</p>
+                <p class="text-4xl font-black text-gray-900">₹{{ total_spend|floatformat:2 }}</p>
+                <div class="mt-4 flex items-center text-xs font-bold text-emerald-600">
+                    <i class="fas fa-chart-line mr-1"></i> Billing is up to date
+                </div>
+            </div>
+            <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden group">
+                <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition duration-500">
+                    <i class="fas fa-eye text-9xl"></i>
+                </div>
+                <p class="text-gray-400 text-xs font-black uppercase tracking-widest mb-1">Total Impressions</p>
+                <p class="text-4xl font-black text-gray-900">{{ total_impressions|default:0 }}</p>
+                <p class="mt-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Across all units</p>
+            </div>
+            <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm relative overflow-hidden group">
+                <div class="absolute -right-4 -bottom-4 opacity-5 group-hover:scale-110 transition duration-500">
+                    <i class="fas fa-mouse-pointer text-9xl"></i>
+                </div>
+                <p class="text-gray-400 text-xs font-black uppercase tracking-widest mb-1">Total Clicks</p>
+                <p class="text-4xl font-black text-gray-900">{{ total_clicks|default:0 }}</p>
+                <div class="mt-4 flex items-center text-xs font-bold text-rose-600">
+                    <i class="fas fa-bullseye mr-1"></i> CTR Tracking Enabled
+                </div>
+            </div>
+        </div>
+
+        <!-- Campaigns List -->
+        <div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+            <div class="px-8 py-6 border-b border-gray-50 flex justify-between items-center">
+                <h2 class="text-xl font-black text-gray-900">My Campaigns</h2>
+                <div class="flex gap-2">
+                    <span
+                        class="px-3 py-1 bg-gray-100 text-[10px] font-black uppercase tracking-widest text-gray-500 rounded-full">Manual
+                        Review Enabled</span>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                        <tr>
+                            <th class="px-8 py-4">Campaign Name</th>
+                            <th class="px-8 py-4">Type</th>
+                            <th class="px-8 py-4">Status</th>
+                            <th class="px-8 py-4 text-right">Performance (I/C)</th>
+                            <th class="px-8 py-4 text-right">Budget Left</th>
+                            <th class="px-8 py-4 text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        {% for campaign in campaigns %}
+                        <tr class="hover:bg-gray-50/50 transition duration-200">
+                            <td class="px-8 py-6">
+                                <p class="text-sm font-bold text-gray-900">{{ campaign.title }}</p>
+                                <p class="text-[10px] text-gray-400">{{ campaign.start_date|date:"d M" }} - {{
+                                    campaign.end_date|date:"d M, Y" }}</p>
+                            </td>
+                            <td class="px-8 py-6">
+                                <span
+                                    class="bg-indigo-50 text-indigo-700 text-[10px] font-black px-2 py-1 rounded shadow-sm">{{
+                                    campaign.get_ad_type_display }}</span>
+                            </td>
+                            <td class="px-8 py-6">
+                                {% if campaign.status == 'ACTIVE' %}
+                                <span class="flex items-center gap-1.5 text-emerald-600 font-bold text-xs">
+                                    <span class="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse"></span> Live
+                                </span>
+                                {% elif campaign.status == 'PENDING_APPROVAL' %}
+                                <span class="text-amber-500 font-bold text-xs"><i class="fas fa-clock mr-1"></i>
+                                    Reviewing</span>
+                                {% else %}
+                                <span class="text-gray-400 font-bold text-xs">{{ campaign.status }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-8 py-6 text-right">
+                                <div class="flex flex-col items-end">
+                                    <span class="text-sm font-black text-gray-900">{{ campaign.impressions }} / {{
+                                        campaign.clicks }}</span>
+                                    <span class="text-[10px] text-rose-500 font-bold">{{ campaign.ctr|floatformat:1 }}%
+                                        CTR</span>
+                                </div>
+                            </td>
+                            <td class="px-8 py-6 text-right">
+                                <p class="text-sm font-black text-gray-900">₹{{ campaign.remaining_budget|floatformat:2
+                                    }}</p>
+                                <p class="text-[10px] text-gray-400">of ₹{{ campaign.total_budget }}</p>
+                            </td>
+                            <td class="px-8 py-6">
+                                <div class="flex justify-center">
+                                    <a href="{% url 'ads:detail' campaign.id %}"
+                                        class="p-2 text-gray-400 hover:text-indigo-600 transition">
+                                        <i class="fas fa-external-link-alt"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="6" class="px-8 py-20 text-center">
+                                <div class="text-gray-300 mb-4"><i class="fas fa-ad fa-4x"></i></div>
+                                <h3 class="text-lg font-bold text-gray-700">No campaigns launched yet</h3>
+                                <p class="text-gray-500 mt-1">Start growing your brand visibility today.</p>
+                                <a href="{% url 'ads:create' %}"
+                                    class="inline-block mt-6 text-rose-600 font-black uppercase text-xs tracking-widest hover:text-rose-700">Launch
+                                    Now &rarr;</a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

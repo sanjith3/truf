@@ -29,10 +29,53 @@
                 <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent"></div>
                 <div class="absolute bottom-0 left-0 p-8 text-white">
                     <h1 class="text-4xl font-bold mb-2">{{ turf.name }}</h1>
-                    <p class="text-lg text-gray-200"><i class="fas fa-map-marker-alt text-brand-500 mr-2"></i> {{
-                        turf.address }}, {{ turf.city }}</p>
+                    <p class="text-lg text-gray-200">
+                        <i class="fas fa-map-marker-alt text-brand-500 mr-2"></i>
+                        {{ turf.address }}, {{ turf.city }}
+                    </p>
                 </div>
             </div>
+
+            <!-- Location and View on Map -->
+            <div
+                class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 flex flex-col md:flex-row justify-between items-center gap-6">
+                <div class="flex items-center">
+                    <div
+                        class="w-12 h-12 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center mr-4">
+                        <i class="fas fa-map-marked-alt text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="font-bold text-gray-900">Venue Location</h4>
+                        <p class="text-gray-500 text-sm">{{ turf.city }}, {{ turf.address|truncatechars:50 }}</p>
+                    </div>
+                </div>
+                {% if turf.latitude and turf.longitude %}
+                <a href="https://www.google.com/maps?q={{ turf.latitude }},{{ turf.longitude }}" target="_blank"
+                    class="w-full md:w-auto px-8 py-3 bg-gray-900 hover:bg-black text-white rounded-xl font-bold transition flex items-center justify-center gap-3">
+                    <i class="fas fa-directions"></i> View on Google Maps
+                </a>
+                {% elif turf.map_share_url %}
+                <a href="{{ turf.map_share_url }}" target="_blank"
+                    class="w-full md:w-auto px-8 py-3 bg-gray-900 hover:bg-black text-white rounded-xl font-bold transition flex items-center justify-center gap-3">
+                    <i class="fas fa-external-link-alt"></i> Open in Maps
+                </a>
+                {% endif %}
+            </div>
+
+            <!-- Promotion Video -->
+            {% if turf.videos.first %}
+            <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+                <h3 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                    <i class="fas fa-video text-brand-600"></i> Venue Promo (15s)
+                </h3>
+                <div class="rounded-2xl overflow-hidden aspect-video bg-black shadow-inner">
+                    <video controls class="w-full h-full">
+                        <source src="{{ turf.videos.first.video.url }}" type="video/mp4">
+                        Your browser does not support the video tag.
+                    </video>
+                </div>
+            </div>
+            {% endif %}
 
             <!-- About Section -->
             <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
@@ -52,6 +95,20 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Photo Gallery -->
+            {% if turf.images.count > 1 %}
+            <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">
+                <h3 class="text-2xl font-bold text-gray-900 mb-6">Venue Photos</h3>
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {% for img in turf.images.all %}
+                    <div class="aspect-square rounded-xl overflow-hidden hover:opacity-90 cursor-pointer transition">
+                        <img src="{{ img.image.url }}" class="w-full h-full object-cover">
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
 
             <!-- Amenities -->
             <div class="bg-white rounded-2xl p-8 shadow-sm border border-gray-100">

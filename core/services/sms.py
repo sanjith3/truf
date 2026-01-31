@@ -4,10 +4,11 @@ import random
 class ConsoleSMSProvider(BaseSMSProvider):
     """A provider that 'sends' SMS by printing to the console."""
     def send_otp(self, phone_number, otp):
-        print(f"\n" + "="*40)
-        print(f" SMS SENT TO: {phone_number}")
-        print(f" MESSAGE: Your TurfSpot OTP is {otp}")
-        print("="*40 + "\n")
+        import logging
+        logger = logging.getLogger('django')
+        msg = f"SMS GATEWAY SIMULATION: Phone {phone_number} received OTP {otp}"
+        print(f"\n[SMS] {msg}\n")
+        logger.info(msg)
         return True
 
 class MockSMSProvider(BaseSMSProvider):

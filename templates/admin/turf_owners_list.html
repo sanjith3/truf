@@ -1,0 +1,174 @@
+{% extends "admin/base_admin.html" %}
+
+{% block page_title %}Turf Owners{% endblock %}
+
+{% block extra_style %}
+.filters-bar {
+background: white;
+padding: 20px;
+border-radius: 12px;
+margin-bottom: 24px;
+display: flex;
+gap: 16px;
+align-items: center;
+}
+
+.filter-input {
+padding: 10px 16px;
+border: 1px solid var(--gray-300);
+border-radius: 8px;
+font-size: 0.875rem;
+}
+
+.table-container {
+background: white;
+border-radius: 12px;
+overflow: hidden;
+box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.data-table {
+width: 100%;
+border-collapse: collapse;
+}
+
+.data-table thead {
+background: var(--gray-800);
+color: white;
+}
+
+.data-table th {
+padding: 16px;
+text-align: left;
+font-weight: 600;
+font-size: 0.875rem;
+text-transform: uppercase;
+}
+
+.data-table tbody tr {
+border-bottom: 1px solid var(--gray-200);
+}
+
+.data-table td {
+padding: 16px;
+}
+
+.owner-info {
+display: flex;
+align-items: center;
+gap: 12px;
+}
+
+.owner-avatar {
+width: 48px;
+height: 48px;
+background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+color: white;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+font-weight: 700;
+}
+{% endblock %}
+
+{% block content %}
+<div class="filters-bar">
+    <form method="get" style="display: flex; gap: 16px; flex: 1;">
+        <input type="text" name="search" value="{{ search }}" placeholder="Search by phone, business name, email..."
+            class="filter-input" style="flex: 1;">
+
+        <select name="status" class="filter-input">
+            <option value="">All Status</option>
+            <option value="approved" {% if status_filter=='approved' %}selected{% endif %}>Approved</option>
+            <option value="pending" {% if status_filter=='pending' %}selected{% endif %}>Pending</option>
+        </select>
+
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-filter"></i>
+            Filter
+        </button>
+    </form>
+</div>
+
+<div class="table-container">
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Owner</th>
+                <th>Business Name</th>
+                <th>Contact Email</th>
+                <th>Turfs</th>
+                <th>Applied Date</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for owner in page_obj %}
+            <tr>
+                <td>
+                    <div class="owner-info">
+                        <div class="owner-avatar">
+                            {{ owner.phone_number|slice:":2" }}
+                        </div>
+                        <div>
+                            <strong>{{ owner.phone_number }}</strong>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    {% if owner.owner_profile %}
+                    {{ owner.owner_profile.business_name }}
+                    {% else %}
+                    <span style="color: var(--gray-500);">-</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if owner.owner_profile %}
+                    {{ owner.owner_profile.contact_email }}
+                    {% else %}
+                    <span style="color: var(--gray-500);">-</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <strong>{{ owner.turfs.count }}</strong> venue{{ owner.turfs.count|pluralize }}
+                </td>
+                <td>
+                    {{ owner.owner_application_date|date:"M d, Y" }}
+                </td>
+                <td>
+                    {% if owner.is_owner_approved %}
+                    <span class="badge badge-success">Approved</span>
+                    {% else %}
+                    <span class="badge badge-warning">Pending</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="text-align: center; padding: 40px; color: var(--gray-500);">
+                    No turf owners found
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if page_obj.has_other_pages %}
+    <div style="display: flex; justify-content: center; gap: 8px; padding: 20px;">
+        {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}"
+            class="btn" style="background: var(--gray-200); color: var(--gray-700);">Previous</a>
+        {% endif %}
+
+        <span style="padding: 10px 20px; color: var(--gray-700);">Page {{ page_obj.number }} of {{
+            page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}"
+            class="btn" style="background: var(--gray-200); color: var(--gray-700);">Next</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

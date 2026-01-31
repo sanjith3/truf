@@ -4,7 +4,9 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from django.conf import settings
+from django.db import transaction
 from .models import CustomUser, TurfOwnerProfile
+from turfs.models import Turf, SportType, TurfImage, TurfVideo
 
 User = get_user_model()
 
@@ -16,7 +18,10 @@ def login_view(request):
             user, created = User.objects.get_or_create(phone_number=phone)
             otp = user.generate_demo_otp()
             request.session['auth_user_id'] = user.id
-            messages.success(request, f"OTP Sent to {phone}. Check Console Logs!")
+            if settings.DEBUG:
+                messages.success(request, f"OTP Sent! [DEMO MODE: OTP is {otp}]")
+            else:
+                messages.success(request, f"OTP Sent to {phone}. Check Console Logs!")
             return redirect('users:verify_otp')
         else:
             messages.error(request, "Please enter a valid phone number.")
@@ -64,6 +69,8 @@ def dashboard_view(request):
             return render(request, 'users/owner_dashboard.html', context)
     return render(request, 'users/dashboard.html', context)
 
+from core.utils.geo import GoogleMapsParser
+
 @login_required
 def register_as_owner(request):
     if request.method == 'POST':
@@ -74,25 +81,82 @@ def register_as_owner(request):
         address = request.POST.get('address')
         zip_code = request.POST.get('zip_code')
         
-        # 2. Update User Flags
-        request.user.is_turf_owner = True
-        request.user.is_owner_approved = False  
-        request.user.owner_application_date = timezone.now()
-        request.user.save()
+        # New Turf Fields
+        description = request.POST.get('description')
+        price_per_hour = request.POST.get('price_per_hour')
+        map_share_url = request.POST.get('map_share_url')
+        sport_ids = request.POST.getlist('sports')
+
+        # Location Extraction Logic
+        latitude, longitude = None, None
+        if map_share_url:
+            if not GoogleMapsParser.is_valid_link(map_share_url):
+                messages.error(request, "Invalid Google Maps link format. Please follow the instructions to get a share link.")
+                return render(request, 'users/register_owner.html', {'sports': SportType.objects.all(), 'form_data': request.POST})
+            
+            latitude, longitude = GoogleMapsParser.extract_lat_lon(map_share_url)
+            
+            if latitude is None or longitude is None:
+                messages.error(request, "Could not extract coordinates from the provided link. Please ensure you dropped a pin before sharing.")
+                return render(request, 'users/register_owner.html', {'sports': SportType.objects.all(), 'form_data': request.POST})
+
+        with transaction.atomic():
+            # 2. Update User Flags
+            request.user.is_turf_owner = True
+            request.user.is_owner_approved = False  
+            request.user.owner_application_date = timezone.now()
+            request.user.save()
+            
+            # 3. Create or Update Profile
+            TurfOwnerProfile.objects.update_or_create(
+                user=request.user,
+                defaults={
+                    'business_name': business_name,
+                    'contact_email': contact_email,
+                    'city': city,
+                    'address': address,
+                    'zip_code': zip_code,
+                }
+            )
+
+            # 4. Create the Turf Instance (Pending Approval)
+            turf = Turf.objects.create(
+                owner=request.user,
+                name=business_name,
+                description=description,
+                address=address,
+                city=city,
+                price_per_hour=price_per_hour,
+                latitude=latitude,
+                longitude=longitude,
+                map_share_url=map_share_url,
+                is_active=False # Visible only after admin approves the owner
+            )
+            
+            # 5. Set Sports
+            if sport_ids:
+                turf.sports.set(sport_ids)
+
+            # 6. Handle Media Uploads
+            # Images
+            images = request.FILES.getlist('images')
+            for i, image in enumerate(images):
+                TurfImage.objects.create(
+                    turf=turf,
+                    image=image,
+                    is_cover=(i == 0) # First image as cover
+                )
+            
+            # Video
+            video = request.FILES.get('video')
+            if video:
+                TurfVideo.objects.create(
+                    turf=turf,
+                    video=video
+                )
         
-        # 3. Create or Update Profile
-        TurfOwnerProfile.objects.update_or_create(
-            user=request.user,
-            defaults={
-                'business_name': business_name,
-                'contact_email': contact_email,
-                'city': city,
-                'address': address,
-                'zip_code': zip_code,
-            }
-        )
-        
-        messages.success(request, "Application submitted! Waiting for Admin verification.")
+        messages.success(request, f"Application submitted! Extracted location: {latitude}, {longitude}")
         return redirect('users:dashboard')
     
-    return render(request, 'users/register_owner.html')
+    sports = SportType.objects.all()
+    return render(request, 'users/register_owner.html', {'sports': sports})

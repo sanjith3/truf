@@ -53,7 +53,7 @@ def book_slot(request, turf_id):
             booking_date=booking_date,
             start_time=start_time,
             end_time=end_time,
-            total_amount=turf.price_per_hour,
+            base_amount=turf.price_per_hour,
             status='PENDING'
         )
         return redirect('bookings:payment', booking_id=booking.booking_id)

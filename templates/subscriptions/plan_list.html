@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h1 class="text-4xl font-black text-gray-900 tracking-tight mb-4">Grow Your Business</h1>
+            <p class="text-xl text-gray-600 max-w-2xl mx-auto">Choose a plan that fits your venue's size and goals.
+                Cancel anytime.</p>
+        </div>
+
+        {% if current_subscription %}
+        <div
+            class="mb-12 bg-white rounded-3xl p-8 border-4 border-indigo-100 shadow-xl max-w-3xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+            <div>
+                <p class="text-indigo-600 font-black uppercase text-xs tracking-widest mb-1">Your Active Plan</p>
+                <h3 class="text-2xl font-black text-gray-900">{{ current_subscription.plan.name }}</h3>
+                <p class="text-gray-500 text-sm">Expires on {{ current_subscription.end_date|date:"d M, Y" }}</p>
+            </div>
+            <div class="bg-indigo-50 px-6 py-2 rounded-2xl">
+                <span class="text-indigo-700 font-bold">Active Status</span>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {% for plan in plans %}
+            <div
+                class="bg-white rounded-3xl border-2 {% if current_subscription.plan == plan %}border-indigo-500 shadow-indigo-100{% else %}border-gray-100{% endif %} overflow-hidden flex flex-col hover:shadow-2xl transition-all duration-300">
+                <div class="p-8 pb-0">
+                    <div class="flex justify-between items-start mb-4">
+                        <span
+                            class="bg-indigo-50 text-indigo-600 text-[10px] font-black px-2 py-1 rounded-lg uppercase">Tier
+                            {{ plan.tier }}</span>
+                        {% if current_subscription.plan == plan %}
+                        <span
+                            class="bg-green-100 text-green-700 text-[10px] font-black px-2 py-1 rounded-lg uppercase">Current</span>
+                        {% endif %}
+                    </div>
+                    <h3 class="text-2xl font-black text-gray-900">{{ plan.name }}</h3>
+                    <div class="mt-4 flex items-baseline">
+                        <span class="text-4xl font-black text-gray-900">₹{{ plan.price|floatformat:0 }}</span>
+                        <span class="ml-1 text-gray-500 font-bold">/30 days</span>
+                    </div>
+                </div>
+
+                <div class="p-8 flex-grow">
+                    <ul class="space-y-4">
+                        {% for feature in plan.features %}
+                        <li class="flex items-start gap-3">
+                            <div
+                                class="mt-1 w-5 h-5 bg-green-50 text-green-600 rounded-full flex items-center justify-center text-[10px]">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <span class="text-gray-600 text-sm font-medium">{{ feature }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <div class="p-8 pt-0">
+                    {% if current_subscription.plan == plan %}
+                    <button disabled
+                        class="w-full bg-gray-100 text-gray-400 font-black py-4 rounded-2xl cursor-not-allowed">
+                        Active Plan
+                    </button>
+                    {% else %}
+                    <a href="{% url 'subscriptions:subscribe' plan.id %}"
+                        class="block w-full text-center bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 rounded-2xl transition-all transform hover:scale-[1.02] active:scale-95 shadow-lg shadow-indigo-200">
+                        Upgrade Now
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

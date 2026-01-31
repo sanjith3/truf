@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 p-8">
+    <div class="max-w-7xl mx-auto">
+        <!-- Header -->
+        <div class="flex justify-between items-center mb-8">
+            <div>
+                <a href="{% url 'core:admin_turfs' %}"
+                    class="text-xs font-bold text-indigo-600 uppercase tracking-widest hover:underline">
+                    <i class="fas fa-arrow-left mr-1"></i> Back to Directory
+                </a>
+                <h1 class="text-3xl font-black text-gray-900 mt-2">Turf Review</h1>
+                <p class="text-gray-500 text-sm">Monitoring dashboard for {{ turf.name }}</p>
+            </div>
+            <div class="flex gap-3">
+                {% if turf.is_active %}
+                <span
+                    class="bg-green-100 text-green-700 font-bold px-4 py-2 rounded-xl text-sm border border-green-200">
+                    <i class="fas fa-check-circle mr-2"></i> Active
+                </span>
+                {% else %}
+                <span class="bg-red-100 text-red-700 font-bold px-4 py-2 rounded-xl text-sm border border-red-200">
+                    <i class="fas fa-eye-slash mr-2"></i> Inactive
+                </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- Left Column: Details -->
+            <div class="space-y-8 lg:col-span-2">
+
+                <!-- 1. Activity Monitoring Cards -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                        <p class="text-xs font-bold text-gray-400 uppercase">Total Bookings</p>
+                        <p class="text-2xl font-black text-gray-900 mt-1">{{ total_bookings }}</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                        <p class="text-xs font-bold text-gray-400 uppercase">Revenue</p>
+                        <p class="text-2xl font-black text-green-600 mt-1">₹{{ total_revenue }}</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                        <p class="text-xs font-bold text-gray-400 uppercase">Success Rate</p>
+                        <p class="text-2xl font-black text-indigo-600 mt-1">{{ success_bookings }}<span
+                                class="text-xs text-gray-400 font-medium ml-1">/ {{ total_bookings }}</span></p>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+                        <p class="text-xs font-bold text-gray-400 uppercase">Cancelled</p>
+                        <p class="text-2xl font-black text-red-500 mt-1">{{ cancelled_bookings }}</p>
+                    </div>
+                </div>
+
+                <!-- 2. Turf Information -->
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-6 border-b border-gray-50 flex justify-between items-center">
+                        <h3 class="font-bold text-gray-900">Venue Details</h3>
+                        <span class="text-xs text-gray-400 font-mono">ID: {{ turf.id }}</span>
+                    </div>
+                    <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase mb-1">Venue Name</p>
+                            <p class="font-medium text-gray-900">{{ turf.name }}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase mb-1">Pricing</p>
+                            <p class="font-medium text-gray-900">₹{{ turf.price_per_hour }} <span
+                                    class="text-gray-400 font-normal">/ hour</span></p>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase mb-1">City</p>
+                            <p class="font-medium text-gray-900">{{ turf.city }}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-gray-400 uppercase mb-1">Sports Supported</p>
+                            <div class="flex flex-wrap gap-2 mt-1">
+                                {% for sport in turf.sports.all %}
+                                <span class="bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded-md">{{
+                                    sport.name }}</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="md:col-span-2">
+                            <p class="text-xs font-bold text-gray-400 uppercase mb-1">Address</p>
+                            <p class="text-sm text-gray-600">{{ turf.address }}</p>
+                            {% if turf.map_share_url %}
+                            <a href="{{ turf.map_share_url }}" target="_blank"
+                                class="inline-flex items-center gap-2 text-blue-600 text-xs font-bold mt-2 hover:underline">
+                                <i class="fas fa-map-marker-alt"></i> View on Google Maps
+                            </a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. Owner Information -->
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-6 border-b border-gray-50">
+                        <h3 class="font-bold text-gray-900">Owner Information</h3>
+                    </div>
+                    <div class="p-6 flex items-start gap-4">
+                        <div
+                            class="w-12 h-12 bg-indigo-50 rounded-full flex items-center justify-center text-indigo-600 font-bold text-lg">
+                            {{ turf.owner.first_name|first|default:"O" }}
+                        </div>
+                        <div>
+                            <p class="font-bold text-gray-900 text-lg">{{ turf.owner.owner_profile.business_name }}</p>
+                            <div class="space-y-1 mt-1">
+                                <p class="text-sm text-gray-600"><i class="fas fa-phone w-5 text-gray-400"></i> {{
+                                    turf.owner.phone_number }}</p>
+                                <p class="text-sm text-gray-600"><i class="fas fa-envelope w-5 text-gray-400"></i> {{
+                                    turf.owner.owner_profile.contact_email }}</p>
+                                <p class="text-sm text-gray-600"><i class="fas fa-calendar w-5 text-gray-400"></i>
+                                    Joined: {{ turf.owner.date_joined|date:"M d, Y" }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 4. System Alerts -->
+                {% if alerts %}
+                <div class="space-y-4">
+                    {% for alert in alerts %}
+                    <div
+                        class="p-4 rounded-xl border-l-4 shadow-sm {% if alert.type == 'critical' %}bg-red-50 border-red-500 text-red-900{% elif alert.type == 'warning' %}bg-orange-50 border-orange-500 text-orange-900{% else %}bg-blue-50 border-blue-500 text-blue-900{% endif %}">
+                        <div class="flex items-start gap-3">
+                            <div class="mt-0.5">
+                                {% if alert.type == 'critical' %}<i class="fas fa-exclamation-circle text-red-600"></i>
+                                {% elif alert.type == 'warning' %}<i
+                                    class="fas fa-exclamation-triangle text-orange-600"></i>
+                                {% else %}<i class="fas fa-info-circle text-blue-600"></i>{% endif %}
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-sm">{{ alert.title }}</h4>
+                                <p class="text-xs mt-1 opacity-80">{{ alert.message }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- 5. Activity Timeline -->
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-6 border-b border-gray-50">
+                        <h3 class="font-bold text-gray-900">Activity Timeline</h3>
+                    </div>
+                    <div class="p-6">
+                        {% if activity_logs %}
+                        <div class="relative space-y-6">
+                            <div class="absolute left-3 top-2 bottom-2 w-0.5 bg-gray-100"></div>
+                            {% for log in activity_logs %}
+                            <div class="relative pl-8">
+                                <span
+                                    class="absolute left-0 top-1.5 w-6 h-6 rounded-full border-2 border-white shadow-sm flex items-center justify-center z-10 {% if log.event_type == 'BOOKING' %}bg-green-100 text-green-600{% elif log.event_type == 'CANCELLATION' %}bg-red-100 text-red-600{% else %}bg-gray-100 text-gray-600{% endif %}">
+                                    <i class="fas fa-circle text-[6px]"></i>
+                                </span>
+                                <div>
+                                    <p class="text-sm font-bold text-gray-900">{{ log.description }}</p>
+                                    <p class="text-[10px] text-gray-400 mt-0.5">{{ log.created_at|date:"M d, Y • h:i A"
+                                        }}{% if log.triggered_by %} • by {{ log.triggered_by.first_name|default:"System"
+                                        }}{% endif %}</p>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="text-center py-8">
+                            <i class="fas fa-history text-gray-300 text-3xl mb-2"></i>
+                            <p class="text-sm text-gray-400">No activity logs recorded yet.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Column: Media & Actions -->
+            <div class="space-y-8">
+
+                <!-- Gallery -->
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-6 border-b border-gray-50">
+                        <h3 class="font-bold text-gray-900">Gallery</h3>
+                    </div>
+                    <div class="p-4 grid grid-cols-2 gap-2">
+                        {% for img in turf.images.all %}
+                        <div class="relative aspect-video rounded-lg overflow-hidden group">
+                            <img src="{{ img.image.url }}"
+                                class="w-full h-full object-cover transition transform group-hover:scale-110">
+                            {% if img.is_cover %}
+                            <span
+                                class="absolute top-1 left-1 bg-black/50 text-white text-[9px] px-1.5 py-0.5 rounded font-bold uppercase backdrop-blur-sm">Cover</span>
+                            {% endif %}
+                        </div>
+                        {% empty %}
+                        <div class="col-span-2 py-8 text-center text-gray-400 text-sm italic">
+                            No images uploaded.
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Admin Actions -->
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+                    <div class="p-6 border-b border-gray-50">
+                        <h3 class="font-bold text-gray-900">Admin Actions</h3>
+                    </div>
+                    <div class="p-6 space-y-3">
+                        <p class="text-xs text-gray-400 mb-2">Manage visibility status:</p>
+
+                        {% if turf.is_active %}
+                        <form action="{% url 'core:hide_turf' turf.id %}" method="POST">
+                            {% csrf_token %}
+                            <button type="submit"
+                                class="w-full flex items-center justify-center gap-2 bg-red-50 text-red-600 hover:bg-red-100 px-4 py-3 rounded-xl font-bold transition">
+                                <i class="fas fa-eye-slash"></i> Hide Turf from App
+                            </button>
+                        </form>
+                        {% else %}
+                        <form action="{% url 'core:approve_turf' turf.id %}" method="POST">
+                            {% csrf_token %}
+                            <button type="submit"
+                                class="w-full flex items-center justify-center gap-2 bg-green-500 text-white hover:bg-green-600 px-4 py-3 rounded-xl font-bold transition shadow-lg shadow-green-200">
+                                <i class="fas fa-check-circle"></i> Activate Turf
+                            </button>
+                        </form>
+                        {% endif %}
+
+                        <a href="tel:{{ turf.owner.phone_number }}"
+                            class="block text-center w-full border border-gray-200 text-gray-600 hover:bg-gray-50 px-4 py-3 rounded-xl font-bold transition mt-2">
+                            <i class="fas fa-phone mr-2"></i> Call Owner
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

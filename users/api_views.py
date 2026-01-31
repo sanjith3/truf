@@ -22,7 +22,12 @@ class LoginAPIView(views.APIView):
             sms = get_sms_provider()
             sms.send_otp(phone, otp)
             
-            return Response({"message": "OTP sent successfully"}, status=status.HTTP_200_OK)
+            response_data = {"message": "OTP sent successfully"}
+            from django.conf import settings
+            if settings.DEBUG:
+                response_data["debug_otp"] = otp
+                
+            return Response(response_data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class VerifyOTPAPIView(views.APIView):

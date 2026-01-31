@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="min-h-screen bg-gray-50/50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-5xl mx-auto">
+        <div class="flex items-center justify-between mb-12">
+            <div>
+                <a href="{% url 'ads:dashboard' %}"
+                    class="text-xs font-black uppercase tracking-widest text-gray-400 hover:text-gray-900 transition">
+                    <i class="fas fa-arrow-left"></i> Command Center
+                </a>
+                <h1 class="text-4xl font-black text-gray-900 mt-6 tracking-tight">{{ campaign.title }}</h1>
+                <div class="flex items-center gap-3 mt-2">
+                    <span class="bg-rose-50 text-rose-600 text-[10px] font-black px-2 py-1 rounded">{{
+                        campaign.advertiser_name }}</span>
+                    <span class="text-gray-400 text-xs font-medium">| Created on {{ campaign.created_at|date:"d M, Y"
+                        }}</span>
+                </div>
+            </div>
+            <div class="text-right">
+                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Status</p>
+                <span
+                    class="inline-flex items-center px-4 py-2 rounded-full text-xs font-black tracking-widest uppercase {% if campaign.status == 'ACTIVE' %}bg-emerald-600{% elif campaign.status == 'COMPLETED' %}bg-gray-900{% else %}bg-amber-500{% endif %} text-white">
+                    {{ campaign.status }}
+                </span>
+            </div>
+        </div>
+
+        <!-- Performance Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-12">
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm transition hover:shadow-md">
+                <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest">Impressions</p>
+                <p class="text-3xl font-black text-gray-900 mt-2">{{ campaign.impressions }}</p>
+                <div class="mt-4 h-1.5 w-full bg-gray-50 rounded-full overflow-hidden">
+                    <div class="h-full bg-indigo-500" style="width: 100%"></div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm transition hover:shadow-md">
+                <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest">Clicks</p>
+                <p class="text-3xl font-black text-gray-900 mt-2">{{ campaign.clicks }}</p>
+                <div class="mt-4 h-1.5 w-full bg-gray-50 rounded-full overflow-hidden">
+                    <div class="h-full bg-rose-500" style="width: 100%"></div>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm transition hover:shadow-md">
+                <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest">CTR %</p>
+                <p class="text-3xl font-black text-gray-900 mt-2">{{ campaign.ctr|floatformat:2 }}%</p>
+                <p class="text-[10px] text-gray-400 font-bold mt-4 uppercase">Direct Engagement Rate</p>
+            </div>
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm transition hover:shadow-md">
+                <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest">Cost Rate</p>
+                <p class="text-3xl font-black text-emerald-600 mt-2">₹{{ campaign.cost_per_unit }}</p>
+                <p class="text-[10px] text-gray-400 font-bold mt-4 uppercase">Model: {{ campaign.cost_model }}</p>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <!-- Details & Budget -->
+            <div class="lg:col-span-2 space-y-8">
+                <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+                    <h3 class="text-xl font-black text-gray-900 mb-6 tracking-tight">Budget Utilization</h3>
+                    <div class="space-y-6">
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-xs font-black text-gray-400 uppercase tracking-widest">Real-time
+                                    Spend</span>
+                                <span class="text-sm font-black text-gray-900">₹{{ campaign.spent_amount|floatformat:2
+                                    }} / ₹{{ campaign.total_budget|floatformat:2 }}</span>
+                            </div>
+                            <div class="h-4 w-full bg-gray-50 rounded-full overflow-hidden p-1 border border-gray-100">
+                                <div class="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full shadow-lg transition-all duration-1000"
+                                    style="width: {{ campaign.budget_utilization_percentage|floatformat:0 }}%">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-6 pt-4 border-t border-gray-50">
+                            <div>
+                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Total Spent
+                                </p>
+                                <p class="text-xl font-black text-gray-900">₹{{ campaign.spent_amount|floatformat:2 }}
+                                </p>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Remaining
+                                    Credit</p>
+                                <p class="text-xl font-black text-rose-600">₹{{ campaign.remaining_budget|floatformat:2
+                                    }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+                    <h3 class="text-xl font-black text-gray-900 mb-6 tracking-tight">Ad Creative Preview</h3>
+                    <div class="relative rounded-2xl overflow-hidden border border-gray-100 bg-gray-50 shadow-inner">
+                        {% if campaign.image %}
+                        <img src="{{ campaign.image.url }}" alt="Preview" class="w-full h-auto">
+                        {% else %}
+                        <div class="py-20 text-center text-gray-300">
+                            <i class="fas fa-image fa-4x mb-4"></i>
+                            <p class="font-bold">No Creative Asset Provided</p>
+                        </div>
+                        {% endif %}
+                        <div class="p-6 bg-white border-t border-gray-100">
+                            <p class="text-[10px] text-rose-600 font-bold uppercase tracking-widest mb-1">Sponsored Unit
+                                Preview</p>
+                            <p class="text-lg font-black text-gray-900">{{ campaign.title }}</p>
+                            <p class="text-sm text-gray-500 mt-1 truncate">{{ campaign.redirect_url }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuration Sidebar -->
+            <div class="space-y-8">
+                <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm">
+                    <h3 class="text-lg font-black text-gray-900 mb-6">Campaign Info</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
+                                <i class="fas fa-th-large text-xs"></i>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Format</p>
+                                <p class="text-xs font-bold text-gray-900">{{ campaign.get_ad_type_display }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
+                                <i class="fas fa-location-arrow text-xs"></i>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Placement</p>
+                                <p class="text-xs font-bold text-gray-900">{{ campaign.get_placement_display }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
+                                <i class="fas fa-calendar-alt text-xs"></i>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Timeline</p>
+                                <p class="text-xs font-bold text-gray-900">{{ campaign.start_date|date:"d M" }} - {{
+                                    campaign.end_date|date:"d M, Y" }}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center text-gray-400">
+                                <i class="fas fa-wallet text-xs"></i>
+                            </div>
+                            <div>
+                                <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Daily Cap</p>
+                                <p class="text-xs font-bold text-gray-900">₹{{ campaign.daily_budget|default:"None" }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    class="bg-gray-900 p-8 rounded-3xl shadow-xl shadow-gray-200 text-white space-y-4 relative overflow-hidden group">
+                    <div
+                        class="absolute top-0 right-0 w-32 h-32 bg-white/5 rounded-full -mr-16 -mt-16 group-hover:scale-110 transition duration-500">
+                    </div>
+                    <h3 class="text-lg font-black italic tracking-tighter relative z-10">Production Analytics</h3>
+                    <p class="text-gray-400 text-sm relative z-10">All data shown here is processed in real-time by our
+                        core billing engine. Every impression and click is verified.</p>
+                    <div class="pt-4 relative z-10">
+                        <div
+                            class="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-emerald-400">
+                            <div class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></div>
+                            Verified Tracking Active
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

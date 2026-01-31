@@ -30,19 +30,102 @@
             </p>
 
             <!-- Quick Search Bar -->
-            <div
-                class="max-w-3xl mx-auto bg-white rounded-full p-2 shadow-2xl flex flex-col md:flex-row gap-2 fade-in delay-200">
-                <div
-                    class="flex-grow flex items-center px-4 md:px-6 py-2 md:py-0 border-b md:border-b-0 md:border-r border-gray-100">
-                    <i class="fas fa-map-marker-alt text-brand-500 mr-3 text-lg"></i>
-                    <input type="text" placeholder="Where do you want to play? (e.g. Kochi)"
-                        class="w-full bg-transparent focus:outline-none text-gray-700 placeholder-gray-400 h-12">
+            <div class="max-w-4xl mx-auto flex flex-col gap-4 fade-in delay-200">
+                <div class="bg-white rounded-2xl md:rounded-full p-2 shadow-2xl flex flex-col md:flex-row gap-2">
+                    <div
+                        class="flex-grow flex items-center px-4 md:px-6 py-2 md:py-0 border-b md:border-b-0 md:border-r border-gray-100">
+                        <i class="fas fa-map-marker-alt text-brand-500 mr-3 text-lg"></i>
+                        <input type="text" id="cityInput" placeholder="Where do you want to play? (e.g. Kochi)"
+                            class="w-full bg-transparent focus:outline-none text-gray-700 placeholder-gray-400 h-12">
+                    </div>
+                    <div class="flex gap-2 p-1">
+                        <button onclick="searchByCity()"
+                            class="flex-grow md:flex-none bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-8 rounded-xl md:rounded-full transition transform hover:scale-105 shadow-lg flex items-center justify-center">
+                            Search
+                        </button>
+                        <button onclick="searchNearby()" id="nearbyBtn"
+                            class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-bold py-3 px-6 rounded-xl md:rounded-full transition flex items-center justify-center gap-2"
+                            title="Find turfs near your current location">
+                            <i class="fas fa-location-arrow"></i>
+                            <span class="md:hidden lg:inline">Near Me</span>
+                        </button>
+                    </div>
                 </div>
-                <a href="{% url 'turfs:list' %}"
-                    class="bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-8 rounded-full transition transform hover:scale-105 shadow-lg flex items-center justify-center">
-                    Search
+            </div>
+
+            <!-- AD Placement: HOME BANNER -->
+            {% if banner_ad %}
+            <div class="mt-16 max-w-5xl mx-auto px-4 fade-in delay-300">
+                <a href="{% url 'ads:redirect' banner_ad.id %}" target="_blank"
+                    class="block relative group overflow-hidden rounded-3xl border-4 border-white/5 shadow-2xl transition hover:border-brand-500/30">
+                    <div class="absolute top-4 left-4 z-20 flex items-center gap-2">
+                        <span
+                            class="bg-black/40 backdrop-blur-md text-white text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-widest border border-white/10">Sponsored</span>
+                    </div>
+                    {% if banner_ad.image %}
+                    <img src="{{ banner_ad.image.url }}" alt="{{ banner_ad.title }}"
+                        class="w-full h-48 md:h-64 object-cover transition duration-700 group-hover:scale-105">
+                    {% else %}
+                    <div
+                        class="w-full h-48 md:h-64 bg-gradient-to-r from-indigo-900 via-brand-900 to-indigo-950 flex flex-col items-center justify-center text-center p-8">
+                        <h3 class="text-2xl md:text-3xl font-black text-white mb-2">{{ banner_ad.title }}</h3>
+                        <p class="text-brand-300 font-bold uppercase tracking-widest text-sm">Special Promotion</p>
+                    </div>
+                    {% endif %}
+                    <div
+                        class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6 pt-12">
+                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div>
+                                <p class="text-white font-black text-xl">{{ banner_ad.title }}</p>
+                                <p class="text-gray-300 text-xs mt-1">{{ banner_ad.advertiser_name }} • Exclusive Event
+                                </p>
+                            </div>
+                            <span
+                                class="inline-flex items-center gap-2 bg-brand-500 text-white font-black px-6 py-2 rounded-full text-sm shadow-xl shadow-brand-500/40">
+                                View Deal <i class="fas fa-arrow-right"></i>
+                            </span>
+                        </div>
+                    </div>
                 </a>
             </div>
+            {% endif %}
+            <script>
+                function searchByCity() {
+                    const city = document.getElementById('cityInput').value;
+                    if (city) {
+                        window.location.href = `{% url 'turfs:list' %}?city=${encodeURIComponent(city)}`;
+                    } else {
+                        window.location.href = "{% url 'turfs:list' %}";
+                    }
+                }
+
+                function searchNearby() {
+                    const btn = document.getElementById('nearbyBtn');
+                    const originalContent = btn.innerHTML;
+
+                    if (!navigator.geolocation) {
+                        alert("Geolocation is not supported by your browser");
+                        return;
+                    }
+
+                    btn.disabled = true;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Locating...';
+
+                    navigator.geolocation.getCurrentPosition(
+                        (position) => {
+                            const lat = position.coords.latitude;
+                            const long = position.coords.longitude;
+                            window.location.href = `{% url 'turfs:list' %}?lat=${lat}&long=${long}&radius=10`;
+                        },
+                        (error) => {
+                            btn.disabled = false;
+                            btn.innerHTML = originalContent;
+                            alert("Unable to retrieve your location. Please check browser permissions.");
+                        },
+                        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                    );
+                }
+            </script>
 
             <p class="mt-4 text-sm text-gray-400 fade-in delay-300">Popular: Chennai, Coimbatore, Kochi, Trivandrum</p>
         </div>

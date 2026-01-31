@@ -15,8 +15,12 @@ class CustomUserAdmin(admin.ModelAdmin):
     actions = ['approve_owners']
 
     def approve_owners(self, request, queryset):
-        queryset.update(is_owner_approved=True)
-        self.message_user(request, "Selected owners have been approved.")
+        for user in queryset:
+            user.is_owner_approved = True
+            user.save()
+            # Also activate their turfs
+            user.turfs.all().update(is_active=True)
+        self.message_user(request, f"{queryset.count()} owner(s) approved and their turfs activated.")
     approve_owners.short_description = "Approve selected Turf Owners"
 
 class TurfOwnerProfileAdmin(admin.ModelAdmin):

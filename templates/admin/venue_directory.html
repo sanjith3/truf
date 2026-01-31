@@ -1,0 +1,255 @@
+{% extends "admin/base_admin.html" %}
+
+{% block page_title %}Venue Directory{% endblock %}
+
+{% block extra_style %}
+.filters-bar {
+background: white;
+padding: 20px;
+border-radius: 12px;
+margin-bottom: 24px;
+display: flex;
+gap: 16px;
+align-items: center;
+flex-wrap: wrap;
+}
+
+.filter-input {
+padding: 10px 16px;
+border: 1px solid var(--gray-300);
+border-radius: 8px;
+font-size: 0.875rem;
+min-width: 200px;
+}
+
+.filter-input:focus {
+outline: none;
+border-color: var(--primary);
+}
+
+.table-container {
+background: white;
+border-radius: 12px;
+overflow: hidden;
+box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.data-table {
+width: 100%;
+border-collapse: collapse;
+}
+
+.data-table thead {
+background: var(--gray-800);
+color: white;
+}
+
+.data-table th {
+padding: 16px;
+text-align: left;
+font-weight: 600;
+font-size: 0.875rem;
+text-transform: uppercase;
+letter-spacing: 0.05em;
+}
+
+.data-table tbody tr {
+border-bottom: 1px solid var(--gray-200);
+cursor: pointer;
+transition: background 0.2s;
+}
+
+.data-table tbody tr:hover {
+background: var(--gray-50);
+}
+
+.data-table td {
+padding: 16px;
+color: var(--gray-700);
+}
+
+.venue-info {
+display: flex;
+align-items: center;
+gap: 12px;
+}
+
+.venue-icon {
+width: 48px;
+height: 48px;
+background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+color: white;
+border-radius: 8px;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 1.25rem;
+}
+
+.venue-details h4 {
+margin: 0;
+font-size: 1rem;
+color: var(--gray-900);
+font-weight: 600;
+}
+
+.venue-details p {
+margin: 4px 0 0 0;
+font-size: 0.75rem;
+color: var(--gray-600);
+}
+
+.pagination {
+display: flex;
+justify-content: center;
+gap: 8px;
+margin-top: 24px;
+}
+
+.pagination a,
+.pagination span {
+padding: 8px 12px;
+border: 1px solid var(--gray-300);
+border-radius: 6px;
+text-decoration: none;
+color: var(--gray-700);
+}
+
+.pagination .current {
+background: var(--primary);
+color: white;
+border-color: var(--primary);
+}
+
+.empty-state {
+text-align: center;
+padding: 60px 20px;
+color: var(--gray-600);
+}
+
+.empty-state i {
+font-size: 4rem;
+color: var(--gray-300);
+margin-bottom: 20px;
+}
+{% endblock %}
+
+{% block content %}
+<div class="filters-bar">
+    <form method="get" style="display: flex; gap: 16px; flex: 1; flex-wrap: wrap;">
+        <input type="text" name="search" value="{{ search }}" placeholder="Search by name, phone, city..."
+            class="filter-input" style="flex: 1; min-width: 300px;">
+
+        <select name="city" class="filter-input">
+            <option value="">All Cities</option>
+            {% for city in cities %}
+            <option value="{{ city }}" {% if city_filter==city %}selected{% endif %}>{{ city }}</option>
+            {% endfor %}
+        </select>
+
+        <select name="status" class="filter-input">
+            <option value="">All Status</option>
+            <option value="active" {% if status_filter=='active' %}selected{% endif %}>Active</option>
+            <option value="inactive" {% if status_filter=='inactive' %}selected{% endif %}>Inactive</option>
+        </select>
+
+        <select name="sort" class="filter-input">
+            <option value="-created_at" {% if sort_by=='-created_at' %}selected{% endif %}>Newest First</option>
+            <option value="created_at" {% if sort_by=='created_at' %}selected{% endif %}>Oldest First</option>
+            <option value="price_per_hour" {% if sort_by=='price_per_hour' %}selected{% endif %}>Price: Low to High
+            </option>
+            <option value="-price_per_hour" {% if sort_by=='-price_per_hour' %}selected{% endif %}>Price: High to Low
+            </option>
+            <option value="city" {% if sort_by=='city' %}selected{% endif %}>City A-Z</option>
+        </select>
+
+        <button type="submit" class="btn btn-primary">
+            <i class="fas fa-filter"></i>
+            Apply Filters
+        </button>
+    </form>
+</div>
+
+<div class="table-container">
+    {% if page_obj %}
+    <table class="data-table">
+        <thead>
+            <tr>
+                <th>Venue Details</th>
+                <th>Owner</th>
+                <th>City</th>
+                <th>Price / Hour</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for turf in page_obj %}
+            <tr onclick="window.location.href='{% url 'admin:venue_detail' turf.id %}'">
+                <td>
+                    <div class="venue-info">
+                        <div class="venue-icon">
+                            <i class="fas fa-futbol"></i>
+                        </div>
+                        <div class="venue-details">
+                            <h4>{{ turf.name }}</h4>
+                            <p>ID: #{{ turf.id }} • Registered: {{ turf.created_at|date:"M d, Y" }}</p>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div>
+                        <strong>{{ turf.owner.phone_number }}</strong>
+                        {% if turf.owner.owner_profile %}
+                        <p style="margin: 4px 0 0 0; font-size: 0.75rem; color: var(--gray-600);">
+                            {{ turf.owner.owner_profile.business_name }}
+                        </p>
+                        {% endif %}
+                    </div>
+                </td>
+                <td>
+                    <i class="fas fa-map-marker-alt" style="color: var(--primary);"></i>
+                    {{ turf.city }}
+                </td>
+                <td>
+                    <strong style="color: var(--success); font-size: 1.125rem;">₹{{ turf.price_per_hour }}</strong>
+                </td>
+                <td>
+                    {% if turf.is_active %}
+                    <span class="badge badge-success">Active</span>
+                    {% else %}
+                    <span class="badge badge-danger">Inactive</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    {% if page_obj.has_other_pages %}
+    <div class="pagination">
+        {% if page_obj.has_previous %}
+        <a
+            href="?page=1{% if search %}&search={{ search }}{% endif %}{% if city_filter %}&city={{ city_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">First</a>
+        <a
+            href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if city_filter %}&city={{ city_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">Previous</a>
+        {% endif %}
+
+        <span class="current">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+        <a
+            href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if city_filter %}&city={{ city_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">Next</a>
+        <a
+            href="?page={{ page_obj.paginator.num_pages }}{% if search %}&search={{ search }}{% endif %}{% if city_filter %}&city={{ city_filter }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}{% if sort_by %}&sort={{ sort_by }}{% endif %}">Last</a>
+        {% endif %}
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="empty-state">
+        <i class="fas fa-search"></i>
+        <h3>No Venues Found</h3>
+        <p>Try adjusting your filters or search criteria.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

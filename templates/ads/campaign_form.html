@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="min-h-screen bg-gray-50/50 py-12 px-4 sm:px-6 lg:px-8">
+    <div class="max-w-3xl mx-auto">
+        <div class="mb-12">
+            <a href="{% url 'ads:dashboard' %}"
+                class="text-xs font-black uppercase tracking-widest text-gray-400 hover:text-gray-900 transition flex items-center gap-2">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+            <h1 class="text-4xl font-black text-gray-900 mt-6 tracking-tight">Launch <span
+                    class="text-rose-600">Campaign</span></h1>
+            <p class="text-gray-500 mt-2 font-medium">Configure your marketing parameters and creative assets.</p>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="space-y-8">
+            {% csrf_token %}
+
+            <!-- Branding Section -->
+            <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm space-y-6">
+                <h3 class="text-lg font-black text-gray-900 flex items-center gap-2">
+                    <i class="fas fa-id-card text-rose-500"></i> Identity & Placement
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-xs font-black uppercase tracking-widest text-gray-400">Advertiser
+                            Name</label>
+                        {{ form.advertiser_name }}
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-black uppercase tracking-widest text-gray-400">Ad Type</label>
+                        {{ form.ad_type }}
+                    </div>
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-black uppercase tracking-widest text-gray-400">Platform Placement</label>
+                    {{ form.placement }}
+                    <p class="text-[10px] text-gray-400">Choose where your ad appears for maximum impact.</p>
+                </div>
+            </div>
+
+            <!-- Creative Section -->
+            <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm space-y-6">
+                <h3 class="text-lg font-black text-gray-900 flex items-center gap-2">
+                    <i class="fas fa-paint-brush text-indigo-500"></i> Creative & Content
+                </h3>
+                <div class="space-y-2">
+                    <label class="text-xs font-black uppercase tracking-widest text-gray-400">Campaign Title</label>
+                    {{ form.title }}
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-black uppercase tracking-widest text-gray-400">Destination URL</label>
+                    {{ form.redirect_url }}
+                </div>
+                <div class="space-y-2">
+                    <label class="text-xs font-black uppercase tracking-widest text-gray-400">Banner Image</label>
+                    <div
+                        class="mt-2 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-100 border-dashed rounded-2xl hover:border-indigo-400 transition cursor-pointer relative">
+                        <div class="space-y-1 text-center">
+                            <i class="fas fa-cloud-upload-alt text-gray-300 text-3xl mb-4"></i>
+                            <div class="flex text-sm text-gray-600">
+                                <span
+                                    class="relative cursor-pointer bg-white rounded-md font-bold text-indigo-600 hover:text-indigo-500">
+                                    Upload Creative Asset
+                                    {{ form.image }}
+                                </span>
+                            </div>
+                            <p class="text-[10px] text-gray-400">PNG, JPG up to 10MB</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Targeting & Budget Section -->
+            <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-sm space-y-6">
+                <h3 class="text-lg font-black text-gray-900 flex items-center gap-2">
+                    <i class="fas fa-bullseye text-emerald-500"></i> Strategy & Financials
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-xs font-black uppercase tracking-widest text-gray-400">Start Date</label>
+                        {{ form.start_date }}
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-black uppercase tracking-widest text-gray-400">End Date</label>
+                        {{ form.end_date }}
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-xs font-black uppercase tracking-widest text-gray-400">Cost Model</label>
+                        {{ form.cost_model }}
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-black uppercase tracking-widest text-gray-400">Cost per Unit
+                            (₹)</label>
+                        {{ form.cost_per_unit }}
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="space-y-2">
+                        <label class="text-xs font-black uppercase tracking-widest text-gray-400">Daily Max (₹)</label>
+                        {{ form.daily_budget }}
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-xs font-black uppercase tracking-widest text-gray-400">Total Campaign Budget
+                            (₹)</label>
+                        {{ form.total_budget }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <button type="submit"
+                class="w-full bg-gray-900 hover:bg-rose-600 text-white font-black py-4 rounded-3xl shadow-2xl transition transform hover:-translate-y-1">
+                SUBMIT FOR APPROVAL &rarr;
+            </button>
+        </form>
+    </div>
+</div>
+
+<style>
+    input[type="file"] {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}

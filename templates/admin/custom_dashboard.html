@@ -11,23 +11,23 @@
         </div>
 
         <nav class="flex-grow px-4 space-y-2 mt-4">
-            <a href="#"
+            <a href="{% url 'core:platform_admin' %}"
                 class="flex items-center gap-3 bg-indigo-800 text-white px-4 py-3 rounded-xl font-bold transition">
                 <i class="fas fa-th-large"></i> Dashboard
             </a>
-            <a href="#"
+            <a href="{% url 'core:admin_users' %}"
                 class="flex items-center gap-3 text-indigo-300 hover:bg-indigo-800 hover:text-white px-4 py-3 rounded-xl font-medium transition">
                 <i class="fas fa-users"></i> User Management
             </a>
-            <a href="#"
+            <a href="{% url 'core:admin_turfs' %}"
                 class="flex items-center gap-3 text-indigo-300 hover:bg-indigo-800 hover:text-white px-4 py-3 rounded-xl font-medium transition">
                 <i class="fas fa-futbol"></i> Venue Directory
             </a>
-            <a href="#"
+            <a href="{% url 'core:admin_bookings' %}"
                 class="flex items-center gap-3 text-indigo-300 hover:bg-indigo-800 hover:text-white px-4 py-3 rounded-xl font-medium transition">
                 <i class="fas fa-calendar-check"></i> All Bookings
             </a>
-            <a href="#"
+            <a href="{% url 'core:admin_pending_owners' %}"
                 class="flex items-center gap-3 text-indigo-300 hover:bg-indigo-800 hover:text-white px-4 py-3 rounded-xl font-medium transition">
                 <i class="fas fa-id-badge"></i> Owner Requests
                 {% if pending_owners > 0 %}
@@ -35,9 +35,13 @@
                     }}</span>
                 {% endif %}
             </a>
-            <a href="#"
+            <a href="{% url 'core:admin_revenue' %}"
                 class="flex items-center gap-3 text-indigo-300 hover:bg-indigo-800 hover:text-white px-4 py-3 rounded-xl font-medium transition">
                 <i class="fas fa-chart-line"></i> Financials
+            </a>
+            <a href="{% url 'core:investor_insights' %}"
+                class="flex items-center gap-3 text-brand-300 hover:bg-indigo-800 hover:text-white px-4 py-3 rounded-xl font-black transition border border-brand-500/30">
+                <i class="fas fa-gem"></i> Investor Insights
             </a>
         </nav>
 
@@ -71,35 +75,68 @@
         </div>
 
         <!-- KPI Grid -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-            <a href="{% url 'core:admin_users' %}"
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+            <!-- 1. Gross Revenue -->
+            <a href="{% url 'core:admin_revenue' %}"
                 class="group bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-indigo-50 transition-all duration-300 transform hover:-translate-y-1 block">
                 <div class="flex justify-between items-start mb-4">
                     <div
                         class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-xl group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                        <i class="fas fa-users"></i>
+                        <i class="fas fa-chart-line"></i>
                     </div>
                     <span
-                        class="bg-green-100 text-green-700 text-[10px] font-black px-2 py-1 rounded-lg uppercase">+12%</span>
-                </div>
-                <p class="text-gray-500 text-sm font-bold">Total Platform Users</p>
-                <p class="text-3xl font-black text-gray-900 mt-1">{{ total_users }}</p>
-            </a>
-
-            <a href="{% url 'core:admin_revenue' %}"
-                class="group bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-brand-50 transition-all duration-300 transform hover:-translate-y-1 block">
-                <div class="flex justify-between items-start mb-4">
-                    <div
-                        class="w-12 h-12 bg-brand-50 text-brand-600 rounded-2xl flex items-center justify-center text-xl group-hover:bg-brand-600 group-hover:text-white transition-colors">
-                        <i class="fas fa-rupee-sign"></i>
-                    </div>
-                    <span
-                        class="bg-blue-100 text-blue-700 text-[10px] font-black px-2 py-1 rounded-lg uppercase">Live</span>
+                        class="bg-green-100 text-green-700 text-[10px] font-black px-2 py-1 rounded-lg uppercase">Live</span>
                 </div>
                 <p class="text-gray-500 text-sm font-bold">Gross Revenue</p>
                 <p class="text-3xl font-black text-gray-900 mt-1">₹{{ total_revenue|floatformat:0 }}</p>
             </a>
 
+            <!-- 2. Platform Earnings -->
+            <div
+                class="group bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-brand-50 transition-all duration-300 transform hover:-translate-y-1 block">
+                <div class="flex justify-between items-start mb-4">
+                    <div
+                        class="w-12 h-12 bg-brand-50 text-brand-600 rounded-2xl flex items-center justify-center text-xl group-hover:bg-brand-600 group-hover:text-white transition-colors">
+                        <i class="fas fa-percentage"></i>
+                    </div>
+                    <span class="bg-blue-100 text-blue-700 text-[10px] font-black px-2 py-1 rounded-lg uppercase">10%
+                        Fee</span>
+                </div>
+                <p class="text-gray-500 text-sm font-bold">Platform Earnings</p>
+                <p class="text-3xl font-black text-brand-600 mt-1">₹{{ platform_earnings|floatformat:2 }}</p>
+            </div>
+
+            <!-- 3. Owner Payouts -->
+            <div
+                class="group bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-emerald-50 transition-all duration-300 transform hover:-translate-y-1 block">
+                <div class="flex justify-between items-start mb-4">
+                    <div
+                        class="w-12 h-12 bg-emerald-50 text-emerald-600 rounded-2xl flex items-center justify-center text-xl group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                        <i class="fas fa-hand-holding-usd"></i>
+                    </div>
+                    <span
+                        class="bg-emerald-100 text-emerald-700 text-[10px] font-black px-2 py-1 rounded-lg uppercase">Payouts</span>
+                </div>
+                <p class="text-gray-500 text-sm font-bold">Owner Payouts</p>
+                <p class="text-3xl font-black text-emerald-600 mt-1">₹{{ owner_payouts|floatformat:2 }}</p>
+            </div>
+
+            <!-- 4. Total Users -->
+            <a href="{% url 'core:admin_users' %}"
+                class="group bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-orange-50 transition-all duration-300 transform hover:-translate-y-1 block">
+                <div class="flex justify-between items-start mb-4">
+                    <div
+                        class="w-12 h-12 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center text-xl group-hover:bg-orange-600 group-hover:text-white transition-colors">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <span
+                        class="bg-orange-100 text-orange-700 text-[10px] font-black px-2 py-1 rounded-lg uppercase">Active</span>
+                </div>
+                <p class="text-gray-500 text-sm font-bold">Total Platform Users</p>
+                <p class="text-3xl font-black text-gray-900 mt-1">{{ total_users }}</p>
+            </a>
+
+            <!-- 5. Active Turf Venues (RESTORED) -->
             <a href="{% url 'core:admin_turfs' %}"
                 class="group bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-blue-50 transition-all duration-300 transform hover:-translate-y-1 block">
                 <div class="flex justify-between items-start mb-4">
@@ -108,26 +145,126 @@
                         <i class="fas fa-futbol"></i>
                     </div>
                     <span
-                        class="bg-indigo-100 text-indigo-700 text-[10px] font-black px-2 py-1 rounded-lg uppercase">Global</span>
+                        class="bg-blue-100 text-blue-700 text-[10px] font-black px-2 py-1 rounded-lg uppercase">Venues</span>
                 </div>
                 <p class="text-gray-500 text-sm font-bold">Active Turf Venues</p>
                 <p class="text-3xl font-black text-gray-900 mt-1">{{ active_turfs }}</p>
             </a>
 
+            <!-- 6. Pending Owners (RESTORED) -->
             <a href="{% url 'core:admin_pending_owners' %}"
-                class="group bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-orange-50 transition-all duration-300 transform hover:-translate-y-1 block">
+                class="group bg-white p-6 rounded-3xl shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-rose-50 transition-all duration-300 transform hover:-translate-y-1 block">
                 <div class="flex justify-between items-start mb-4">
                     <div
-                        class="w-12 h-12 bg-orange-50 text-orange-600 rounded-2xl flex items-center justify-center text-xl group-hover:bg-orange-600 group-hover:text-white transition-colors">
+                        class="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center text-xl group-hover:bg-rose-600 group-hover:text-white transition-colors">
                         <i class="fas fa-clock"></i>
                     </div>
                     <span
-                        class="bg-orange-100 text-orange-700 text-[10px] font-black px-2 py-1 rounded-lg uppercase">Action
-                        Required</span>
+                        class="bg-rose-100 text-rose-700 text-[10px] font-black px-2 py-1 rounded-lg uppercase">Review</span>
                 </div>
                 <p class="text-gray-500 text-sm font-bold">Pending Owners</p>
                 <p class="text-3xl font-black text-gray-900 mt-1">{{ pending_owners }}</p>
             </a>
+        </div>
+
+        <!-- Revenue Breakdown Section -->
+        <div
+            class="bg-indigo-900 rounded-3xl p-8 mb-10 text-white shadow-2xl shadow-indigo-200 relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-8 opacity-10">
+                <i class="fas fa-wallet text-9xl"></i>
+            </div>
+            <div class="relative z-10">
+                <h3 class="text-xl font-black mb-6 flex items-center gap-2">
+                    <i class="fas fa-chart-pie text-brand-400"></i>
+                    Revenue Breakdown
+                </h3>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="space-y-1">
+                        <p class="text-indigo-300 text-xs font-bold uppercase tracking-widest">Total Gross Revenue</p>
+                        <p class="text-3xl font-black">₹{{ total_revenue|floatformat:2 }}</p>
+                        <p class="text-[10px] text-indigo-400 font-medium">Sum of all successful bookings</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-indigo-300 text-xs font-bold uppercase tracking-widest">Platform Earnings (Total)
+                        </p>
+                        <p class="text-3xl font-black text-brand-400">₹{{ platform_earnings|floatformat:2 }}</p>
+                        <p class="text-[10px] text-indigo-400 font-medium">Commission + {{ total_convenience_fees }}
+                            from fees</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-indigo-300 text-xs font-bold uppercase tracking-widest">Paid to Turf Owners</p>
+                        <p class="text-3xl font-black text-emerald-400">₹{{ owner_payouts|floatformat:2 }}</p>
+                        <p class="text-[10px] text-indigo-400 font-medium">Net distributed earnings</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mt-10 pt-10 border-t border-indigo-800/50">
+                    <div class="space-y-1">
+                        <p class="text-indigo-300 text-xs font-bold uppercase tracking-widest">Convenience Fees (Only)
+                        </p>
+                        <p class="text-2xl font-black text-indigo-100">₹{{ total_convenience_fees|floatformat:2 }}</p>
+                        <p class="text-[10px] text-indigo-400 font-medium">Extra revenue from checkout fees</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-indigo-300 text-xs font-bold uppercase tracking-widest">Ad & Sponsorship Revenue
+                        </p>
+                        <p class="text-2xl font-black text-rose-400">₹{{ total_ad_revenue|floatformat:2 }}</p>
+                        <p class="text-[10px] text-indigo-400 font-medium">From active ad campaigns</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-indigo-300 text-xs font-bold uppercase tracking-widest">Monthly Subscription
+                            (MRR)</p>
+                        <p class="text-3xl font-black text-amber-400">₹{{ mrr|floatformat:2 }}</p>
+                        <p class="text-[10px] text-indigo-400 font-medium">From {{ active_subscribers }} owners</p>
+                    </div>
+                    <div class="space-y-1">
+                        <p class="text-indigo-300 text-xs font-bold uppercase tracking-widest">Tournament/Event Revenue
+                        </p>
+                        <p class="text-3xl font-black text-rose-400">₹{{ total_event_revenue|floatformat:2 }}</p>
+                        <p class="text-[10px] text-indigo-400 font-medium">Commissions + Listing Fees</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- KPI Breakdown (4-column) -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest">Ad Power</p>
+                    <p class="text-2xl font-black text-gray-900 mt-1">{{ active_ad_campaigns }}</p>
+                </div>
+                <div class="w-12 h-12 bg-rose-50 text-rose-600 rounded-2xl flex items-center justify-center text-xl">
+                    <i class="fas fa-ad"></i>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest">Active Subs</p>
+                    <p class="text-2xl font-black text-gray-900 mt-1">{{ active_subscribers }}</p>
+                </div>
+                <div class="w-12 h-12 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center text-xl">
+                    <i class="fas fa-crown"></i>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest">Event Earnings</p>
+                    <p class="text-2xl font-black text-rose-600 mt-1">₹{{ total_event_revenue|floatformat:0 }}</p>
+                </div>
+                <div
+                    class="w-12 h-12 bg-indigo-50 text-indigo-600 rounded-2xl flex items-center justify-center text-xl">
+                    <i class="fas fa-trophy"></i>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between">
+                <div>
+                    <p class="text-gray-400 text-[10px] font-black uppercase tracking-widest">Platform Fees</p>
+                    <p class="text-2xl font-black text-brand-600 mt-1">₹{{ total_convenience_fees|floatformat:0 }}</p>
+                </div>
+                <div class="w-12 h-12 bg-brand-50 text-brand-600 rounded-2xl flex items-center justify-center text-xl">
+                    <i class="fas fa-coins"></i>
+                </div>
+            </div>
         </div>
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-10">
@@ -208,6 +345,38 @@
                         {% endfor %}
                     </div>
                 </div>
+
+                <!-- Ad Campaigns -->
+                <div class="bg-white overflow-hidden rounded-3xl shadow-sm border border-gray-100">
+                    <div class="p-6 border-b border-gray-50 flex justify-between items-center">
+                        <h3 class="font-black text-gray-900 uppercase text-xs tracking-widest">Ad Requests</h3>
+                        <span class="bg-rose-100 text-rose-700 text-[10px] font-black px-2 py-0.5 rounded-full">{{
+                            pending_ads_count }}</span>
+                    </div>
+                    <div class="divide-y divide-gray-50 max-h-[400px] overflow-y-auto">
+                        {% for ad in pending_ads %}
+                        <div class="p-5 flex items-center gap-4 hover:bg-gray-50 transition-colors">
+                            <div
+                                class="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center text-rose-600 font-bold">
+                                <i class="fas fa-ad"></i>
+                            </div>
+                            <div class="flex-grow">
+                                <p class="text-xs font-bold text-gray-900">{{ ad.title }}</p>
+                                <p class="text-[10px] text-gray-500">{{ ad.advertiser_name }} • Budget ₹{{
+                                    ad.total_budget }}</p>
+                                <a href="{% url 'ads:detail' ad.id %}"
+                                    class="text-[9px] font-bold text-indigo-500 hover:underline">View Creative Asset</a>
+                            </div>
+                            <a href="{% url 'core:approve_ad' ad.id %}"
+                                class="bg-rose-500 hover:bg-rose-600 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg transition shadow-sm">
+                                Approve
+                            </a>
+                        </div>
+                        {% empty %}
+                        <div class="p-10 text-center text-gray-400 text-xs">No pending ads.</div>
+                        {% endfor %}
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -227,38 +396,34 @@
                     <thead class="bg-gray-50 text-[10px] font-black text-gray-400 uppercase tracking-widest">
                         <tr>
                             <th class="px-8 py-4">Booking ID</th>
-                            <th class="px-8 py-4">User</th>
                             <th class="px-8 py-4">Turf</th>
-                            <th class="px-8 py-4">Date</th>
-                            <th class="px-8 py-4">Amount</th>
+                            <th class="px-8 py-4 text-right">Amount</th>
+                            <th class="px-8 py-4 text-right">Platform Fee</th>
+                            <th class="px-8 py-4 text-right">Owner Net</th>
                             <th class="px-8 py-4 text-center">Status</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50">
                         {% for booking in recent_bookings %}
                         <tr class="hover:bg-indigo-50/30 transition-colors">
-                            <td class="px-8 py-6 font-mono text-xs font-bold text-indigo-600">#{{
-                                booking.booking_id|slice:":8" }}...</td>
                             <td class="px-8 py-6">
-                                <p class="text-sm font-bold text-gray-900">{{ booking.user.phone_number }}</p>
+                                <p class="text-xs font-mono font-bold text-indigo-600">#{{ booking.short_id }}</p>
+                                <p class="text-[10px] text-gray-400">{{ booking.booking_date|date:"d M, Y" }}</p>
                             </td>
                             <td class="px-8 py-6">
-                                <p class="text-sm text-gray-700">{{ booking.turf.name }}</p>
+                                <p class="text-sm font-bold text-gray-900 truncate max-w-[150px]">{{ booking.turf.name
+                                    }}</p>
+                                <p class="text-[10px] text-gray-500">{{ booking.user.phone_number }}</p>
                             </td>
-                            <td class="px-8 py-6 text-sm text-gray-500">{{ booking.booking_date|date:"d M, Y" }}</td>
-                            <td class="px-8 py-6 font-bold text-gray-900">₹{{ booking.total_amount }}</td>
+                            <td class="px-8 py-6 text-right font-bold text-gray-900">₹{{ booking.total_amount }}</td>
+                            <td class="px-8 py-6 text-right font-bold text-brand-600">₹{{ booking.platform_commission }}
+                            </td>
+                            <td class="px-8 py-6 text-right font-bold text-emerald-600">₹{{ booking.owner_earnings }}
+                            </td>
                             <td class="px-8 py-6">
                                 <div class="flex justify-center">
-                                    {% if booking.status == 'CONFIRMED' %}
                                     <span
                                         class="bg-green-100 text-green-700 text-[10px] font-black px-3 py-1 rounded-full uppercase">Success</span>
-                                    {% elif booking.status == 'PENDING' %}
-                                    <span
-                                        class="bg-yellow-100 text-yellow-700 text-[10px] font-black px-3 py-1 rounded-full uppercase">Pending</span>
-                                    {% else %}
-                                    <span
-                                        class="bg-red-100 text-red-700 text-[10px] font-black px-3 py-1 rounded-full uppercase">Failed</span>
-                                    {% endif %}
                                 </div>
                             </td>
                         </tr>
@@ -311,8 +476,6 @@
 </script>
 
 <style>
-    /* Remove base.html navbar/footer if in dashboard if you want a clean view */
-    /* For now we keep them or we can hide them with JS if needed */
     nav,
     footer {
         display: none !important;

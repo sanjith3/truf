@@ -4,19 +4,68 @@ from django.contrib import messages
 from .models import Turf, TurfImage
 from .forms import TurfForm, TurfImageForm
 
+from core.services.location import LocationService
+
+from django.db.models import Value
+from django.db.models.functions import Coalesce
+
 def turf_list(request):
-    turfs = Turf.objects.filter(is_active=True)
+    from subscriptions.models import OwnerSubscription
+    from django.utils import timezone
+    from django.db import models
+    
+    # Optimized query with real-time subscription status check
+    # Only ACTIVE and NON-EXPIRED subscriptions contribute to ranking
+    now = timezone.now()
+    turfs = Turf.objects.filter(is_active=True).annotate(
+        priority_tier=Coalesce(
+            models.Subquery(
+                OwnerSubscription.objects.filter(
+                    owner=models.OuterRef('owner'),
+                    status='ACTIVE',
+                    end_date__gt=now
+                ).values('plan__tier')[:1]
+            ), 
+            Value(0)
+        )
+    ).order_by('-priority_tier', '-created_at').select_related('owner')
+    
+    # Location Search
+    lat = request.GET.get('lat')
+    lon = request.GET.get('long')
+    radius = request.GET.get('radius', 5)
+    
+    # City Search
     city = request.GET.get('city')
     if city:
         turfs = turfs.filter(city__icontains=city)
         
+    # Apply Radius Search if Lat/Long exists
+    if lat and lon:
+        try:
+            turfs = LocationService.get_nearby_turfs(
+                turfs, float(lat), float(lon), float(radius)
+            )
+        except (ValueError, TypeError):
+            pass
+            
+    # Fetch Sponsored Ads for LISTING placement
+    from ads.services import AdService
+    sponsored_ads = AdService.get_served_ads('LISTING', city=city, limit=2)
+    
+    # Record impressions
+    for ad in sponsored_ads:
+        AdService.record_impression(ad, user=request.user if request.user.is_authenticated else None, city=city)
+            
     context = {
-        'turfs': turfs
+        'turfs': turfs,
+        'sponsored_ads': sponsored_ads,
+        'has_location': bool(lat and lon)
     }
     return render(request, 'turfs/turf_list.html', context)
 
 def turf_detail(request, turf_id):
-    turf = get_object_or_404(Turf, id=turf_id)
+    turf = get_object_or_404(Turf, id=turf_id, is_active=True)
     context = {
         'turf': turf
     }

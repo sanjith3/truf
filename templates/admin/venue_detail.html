@@ -1,0 +1,359 @@
+{% extends "admin/base_admin.html" %}
+
+{% block page_title %}{{ turf.name }} - Venue Details{% endblock %}
+
+{% block extra_style %}
+.detail-grid {
+display: grid;
+grid-template-columns: 2fr 1fr;
+gap: 24px;
+margin-bottom: 24px;
+}
+
+.detail-card {
+background: white;
+border-radius: 12px;
+padding: 24px;
+box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.card-header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-bottom: 20px;
+padding-bottom: 16px;
+border-bottom: 2px solid var(--gray-100);
+}
+
+.card-title {
+display: flex;
+align-items: center;
+gap: 10px;
+font-size: 1.25rem;
+font-weight: 700;
+color: var(--gray-900);
+}
+
+.info-grid {
+display: grid;
+gap: 16px;
+}
+
+.info-row {
+display: grid;
+grid-template-columns: 140px 1fr;
+gap: 12px;
+padding: 12px 0;
+border-bottom: 1px solid var(--gray-100);
+}
+
+.info-label {
+font-weight: 600;
+color: var(--gray-600);
+font-size: 0.875rem;
+}
+
+.info-value {
+color: var(--gray-900);
+}
+
+.sports-grid {
+display: flex;
+flex-wrap: wrap;
+gap: 8px;
+}
+
+.sport-badge {
+background: var(--gray-100);
+color: var(--gray-700);
+padding: 6px 14px;
+border-radius: 16px;
+font-size: 0.875rem;
+font-weight: 600;
+display: inline-flex;
+align-items: center;
+gap: 6px;
+}
+
+.images-grid {
+display: grid;
+grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+gap: 16px;
+margin-top: 16px;
+}
+
+.image-item {
+position: relative;
+border-radius: 12px;
+overflow: hidden;
+aspect-ratio: 1;
+background: var(--gray-100);
+}
+
+.image-item img {
+width: 100%;
+height: 100%;
+object-fit: cover;
+}
+
+.cover-badge {
+position: absolute;
+top: 10px;
+right: 10px;
+background: var(--success);
+color: white;
+padding: 6px 12px;
+border-radius: 6px;
+font-size: 0.75rem;
+font-weight: 700;
+}
+
+.action-buttons {
+display: flex;
+gap: 12px;
+margin-top: 24px;
+}
+
+.status-card {
+background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+color: white;
+padding: 24px;
+border-radius: 12px;
+text-align: center;
+}
+
+.status-icon {
+font-size: 3rem;
+margin-bottom: 12px;
+}
+
+.status-text {
+font-size: 1.125rem;
+font-weight: 600;
+margin-bottom: 8px;
+}
+
+.full-width {
+grid-column: 1 / -1;
+}
+{% endblock %}
+
+{% block content %}
+<div style="margin-bottom: 24px;">
+    <a href="{% url 'admin:venue_directory' %}" class="btn" style="background: var(--gray-600); color: white;">
+        <i class="fas fa-arrow-left"></i>
+        Back to Directory
+    </a>
+</div>
+
+<div class="detail-grid">
+    <div>
+        <div class="detail-card">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-futbol" style="color: var(--primary);"></i>
+                    Venue Information
+                </h2>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-row">
+                    <div class="info-label">Turf ID:</div>
+                    <div class="info-value"><strong>#{{ turf.id }}</strong></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Turf Name:</div>
+                    <div class="info-value"><strong>{{ turf.name }}</strong></div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Description:</div>
+                    <div class="info-value">{{ turf.description }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Price per Hour:</div>
+                    <div class="info-value">
+                        <strong style="color: var(--success); font-size: 1.5rem;">₹{{ turf.price_per_hour }}</strong>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Sports Available:</div>
+                    <div class="info-value">
+                        <div class="sports-grid">
+                            {% for sport in turf.sports.all %}
+                            <span class="sport-badge">
+                                {% if sport.icon %}<i class="fas {{ sport.icon }}"></i>{% endif %}
+                                {{ sport.name }}
+                            </span>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Registered:</div>
+                    <div class="info-value">{{ turf.created_at|date:"F d, Y H:i" }}</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="detail-card" style="margin-top: 24px;">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-map-marker-alt" style="color: var(--danger);"></i>
+                    Location Details
+                </h2>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-row">
+                    <div class="info-label">Full Address:</div>
+                    <div class="info-value">{{ turf.address }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">City:</div>
+                    <div class="info-value">{{ turf.city }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Coordinates:</div>
+                    <div class="info-value">
+                        {% if turf.latitude and turf.longitude %}
+                        <a href="https://www.google.com/maps?q={{ turf.latitude }},{{ turf.longitude }}" target="_blank"
+                            style="color: var(--primary); text-decoration: none; font-weight: 600;">
+                            <i class="fas fa-external-link-alt"></i>
+                            {{ turf.latitude|floatformat:4 }}, {{ turf.longitude|floatformat:4 }}
+                        </a>
+                        {% else %}
+                        <span style="color: var(--gray-500);">Not available</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if turf.map_share_url %}
+                <div class="info-row">
+                    <div class="info-label">Maps Link:</div>
+                    <div class="info-value">
+                        <a href="{{ turf.map_share_url }}" target="_blank"
+                            style="color: var(--primary); text-decoration: none; font-weight: 600;">
+                            <i class="fas fa-map"></i>
+                            View on Google Maps
+                        </a>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div>
+        <div class="status-card">
+            <div class="status-icon">
+                {% if turf.is_active %}
+                <i class="fas fa-check-circle"></i>
+                {% else %}
+                <i class="fas fa-times-circle"></i>
+                {% endif %}
+            </div>
+            <div class="status-text">
+                {% if turf.is_active %}
+                ACTIVE
+                {% else %}
+                INACTIVE
+                {% endif %}
+            </div>
+            <p style="font-size: 0.875rem; opacity: 0.9;">
+                {% if turf.is_active %}
+                This venue is visible to customers
+                {% else %}
+                This venue is hidden from customers
+                {% endif %}
+            </p>
+
+            <form method="post" action="{% url 'admin:toggle_turf_status' turf.id %}" style="margin-top: 20px;">
+                {% csrf_token %}
+                <button type="submit" class="btn" style="background: white; color: var(--primary); width: 100%;">
+                    {% if turf.is_active %}
+                    <i class="fas fa-eye-slash"></i>
+                    Deactivate Venue
+                    {% else %}
+                    <i class="fas fa-eye"></i>
+                    Activate Venue
+                    {% endif %}
+                </button>
+            </form>
+        </div>
+
+        <div class="detail-card" style="margin-top: 24px;">
+            <div class="card-header">
+                <h2 class="card-title">
+                    <i class="fas fa-user-tie" style="color: var(--warning);"></i>
+                    Owner Details
+                </h2>
+            </div>
+
+            <div class="info-grid">
+                <div class="info-row">
+                    <div class="info-label">Phone:</div>
+                    <div class="info-value"><strong>{{ turf.owner.phone_number }}</strong></div>
+                </div>
+                {% if turf.owner.owner_profile %}
+                <div class="info-row">
+                    <div class="info-label">Business Name:</div>
+                    <div class="info-value">{{ turf.owner.owner_profile.business_name }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Email:</div>
+                    <div class="info-value">{{ turf.owner.owner_profile.contact_email }}</div>
+                </div>
+                <div class="info-row">
+                    <div class="info-label">Status:</div>
+                    <div class="info-value">
+                        {% if turf.owner.is_owner_approved %}
+                        <span class="badge badge-success">Approved</span>
+                        {% else %}
+                        <span class="badge badge-warning">Pending</span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if turf.images.all %}
+<div class="detail-card full-width">
+    <div class="card-header">
+        <h2 class="card-title">
+            <i class="fas fa-images" style="color: #8b5cf6;"></i>
+            Venue Images ({{ turf.images.count }})
+        </h2>
+    </div>
+
+    <div class="images-grid">
+        {% for image in turf.images.all %}
+        <div class="image-item">
+            <img src="{{ image.image.url }}" alt="Venue Image">
+            {% if image.is_cover %}
+            <span class="cover-badge">COVER</span>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+{% if turf.videos.all %}
+<div class="detail-card full-width" style="margin-top: 24px;">
+    <div class="card-header">
+        <h2 class="card-title">
+            <i class="fas fa-video" style="color: var(--danger);"></i>
+            Promotional Video
+        </h2>
+    </div>
+
+    <video controls style="width: 100%; max-width: 600px; border-radius: 12px;">
+        <source src="{{ turf.videos.first.video.url }}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+</div>
+{% endif %}
+{% endblock %}

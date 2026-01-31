@@ -1,0 +1,246 @@
+{% extends "admin/base_admin.html" %}
+{% load static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    .pending-list-container {
+        max-width: 1200px;
+        margin: 30px auto;
+        padding: 0 20px;
+    }
+
+    .page-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        padding-bottom: 20px;
+        border-bottom: 3px solid #f59e0b;
+    }
+
+    .page-header h1 {
+        font-size: 2rem;
+        color: #111827;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .back-link {
+        background: #6b7280;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: background 0.2s;
+    }
+
+    .back-link:hover {
+        background: #4b5563;
+    }
+
+    .applications-table {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .applications-table table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .applications-table thead {
+        background: #1f2937;
+        color: white;
+    }
+
+    .applications-table th {
+        padding: 16px;
+        text-align: left;
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.875rem;
+        letter-spacing: 0.05em;
+    }
+
+    .applications-table td {
+        padding: 16px;
+        border-bottom: 1px solid #f3f4f6;
+        color: #374151;
+    }
+
+    .applications-table tbody tr:hover {
+        background: #f9fafb;
+    }
+
+    .applicant-info {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .applicant-icon {
+        width: 40px;
+        height: 40px;
+        background: #dbeafe;
+        color: #1e40af;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+    }
+
+    .applicant-details h4 {
+        margin: 0;
+        font-size: 1rem;
+        color: #111827;
+        font-weight: 600;
+    }
+
+    .applicant-details p {
+        margin: 4px 0 0 0;
+        font-size: 0.875rem;
+        color: #6b7280;
+    }
+
+    .business-badge {
+        display: inline-block;
+        background: #ecfdf5;
+        color: #059669;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 0.875rem;
+        font-weight: 600;
+    }
+
+    .date-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        color: #6b7280;
+        font-size: 0.875rem;
+    }
+
+    .view-btn {
+        background: #3b82f6;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: background 0.2s;
+        border: none;
+        cursor: pointer;
+    }
+
+    .view-btn:hover {
+        background: #2563eb;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #6b7280;
+    }
+
+    .empty-state i {
+        font-size: 4rem;
+        color: #d1d5db;
+        margin-bottom: 20px;
+    }
+
+    .empty-state h3 {
+        font-size: 1.5rem;
+        color: #374151;
+        margin-bottom: 10px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pending-list-container">
+    <div class="page-header">
+        <h1>
+            <i class="fas fa-clipboard-check" style="color: #f59e0b;"></i>
+            Pending Approvals
+        </h1>
+        <a href="{% url 'admin:index' %}" class="back-link">
+            <i class="fas fa-arrow-left"></i>
+            Back to Dashboard
+        </a>
+    </div>
+
+    {% if pending_owners %}
+    <div class="applications-table">
+        <table>
+            <thead>
+                <tr>
+                    <th>Applicant</th>
+                    <th>Applied Date</th>
+                    <th>Business Details</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for owner in pending_owners %}
+                <tr>
+                    <td>
+                        <div class="applicant-info">
+                            <div class="applicant-icon">
+                                {{ owner.phone_number|slice:":2" }}
+                            </div>
+                            <div class="applicant-details">
+                                <h4>{{ owner.phone_number }}</h4>
+                                <p>{{ owner.owner_profile.contact_email }}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="date-badge">
+                            <i class="fas fa-calendar"></i>
+                            {{ owner.owner_application_date|date:"d M Y H:i" }}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="business-badge">
+                            {{ owner.owner_profile.business_name }}
+                        </div>
+                        <p style="margin: 8px 0 0 0; color: #6b7280; font-size: 0.875rem;">
+                            <i class="fas fa-map-marker-alt"></i> {{ owner.owner_profile.city }}
+                        </p>
+                    </td>
+                    <td>
+                        <a href="{% url 'admin:pending_approval_detail' owner.id %}" class="view-btn">
+                            <i class="fas fa-eye"></i>
+                            Review Details
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="applications-table">
+        <div class="empty-state">
+            <i class="fas fa-check-circle"></i>
+            <h3>All Caught Up!</h3>
+            <p>There are no pending turf owner applications at the moment.</p>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

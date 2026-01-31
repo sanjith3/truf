@@ -47,12 +47,37 @@ class CustomUser(AbstractUser):
         return self.phone_number
 
     def generate_demo_otp(self):
-        self.otp = str(random.randint(100000, 999999))
+        from django.conf import settings
+        # STATIC OTP FOR DEBUG MODE TO UNBLOCK USER
+        if settings.DEBUG:
+            self.otp = "123456"
+        else:
+            self.otp = str(random.randint(100000, 999999))
+            
         self.otp_created_at = timezone.now()
         self.save()
-        print(f"========================================")
-        print(f" DEMO OTP for {self.phone_number}: {self.otp} ")
-        print(f"========================================")
+        
+        # 1. FILE-BASED FAILSAFE (Check root directory for OTP_ACTUAL.txt)
+        try:
+            with open("OTP_ACTUAL.txt", "w") as f:
+                f.write(f"USER: {self.phone_number}\nOTP: {self.otp}\nTIME: {timezone.now()}\n\nDEBUG_MODE: {'ACTIVE' if settings.DEBUG else 'OFF'}")
+        except Exception as e:
+            print(f"FAILED TO WRITE OTP FILE: {e}")
+
+        # 2. ULTRA-LOUD TERMINAL BROADCAST
+        # Using print(..., flush=True) for immediate visibility across all terminal types
+        print("\n" + "="*50)
+        print("🚀🚀🚀 TURFSPOT AUTHENTICATION 🚀🚀🚀")
+        print(f"DEVICE: {self.phone_number}")
+        print(f"OTP:    >>> {self.otp} <<<")
+        print(f"MODE:   {'DEBUG (STATIC)' if settings.DEBUG else 'PRODUCTION (RANDOM)'}")
+        print("="*50 + "\n", flush=True)
+        
+        # 3. LOGGING CHANNEL
+        import logging
+        logger = logging.getLogger('django')
+        logger.error(f"OTP_SENT: {self.phone_number} -> {self.otp}")
+        
         return self.otp
 
 class TurfOwnerProfile(models.Model):
