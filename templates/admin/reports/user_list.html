@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 p-8">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex justify-between items-center mb-10">
+            <div>
+                <a href="{% url 'core:platform_admin' %}"
+                    class="text-xs font-bold text-indigo-600 uppercase tracking-widest hover:underline">
+                    <i class="fas fa-arrow-left mr-1"></i> Back to Dashboard
+                </a>
+                <h1 class="text-3xl font-black text-gray-900 mt-2">{{ title }}</h1>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                        <tr>
+                            <th class="px-8 py-4">User Details</th>
+                            <th class="px-8 py-4">Role</th>
+                            <th class="px-8 py-4">Joined Date</th>
+                            <th class="px-8 py-4">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        {% for u in report_users %}
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-8 py-6">
+                                <p class="text-sm font-bold text-gray-900">{{ u.phone_number }}</p>
+                                <p class="text-xs text-gray-500">{{ u.email|default:"No email set" }}</p>
+                            </td>
+                            <td class="px-8 py-6">
+                                {% if u.is_staff %}
+                                <span
+                                    class="bg-purple-100 text-purple-700 text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">Admin</span>
+                                {% elif u.is_turf_owner %}
+                                <span
+                                    class="bg-indigo-100 text-indigo-700 text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">Owner</span>
+                                {% else %}
+                                <span
+                                    class="bg-gray-100 text-gray-600 text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">Player</span>
+                                {% endif %}
+                            </td>
+                            <td class="px-8 py-6 text-sm text-gray-500">{{ u.date_joined|date:"d M Y" }}</td>
+                            <td class="px-8 py-6 text-sm">
+                                {% if u.is_active %}
+                                <span class="text-green-500 font-bold"><i class="fas fa-check-circle mr-1"></i>
+                                    Active</span>
+                                {% else %}
+                                <span class="text-red-500 font-bold"><i class="fas fa-times-circle mr-1"></i>
+                                    Suspended</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

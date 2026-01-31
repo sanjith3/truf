@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-xl mx-auto py-12 px-4">
+    <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+        <div class="bg-indigo-900 p-8 text-white text-center">
+            <h1 class="text-2xl font-bold">Secure Payment</h1>
+            <p class="text-indigo-200 mt-2">Demo Gateway - No real money needed</p>
+        </div>
+
+        <div class="p-8">
+            <div class="bg-gray-50 rounded-2xl p-6 mb-8">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-gray-500">Venue</span>
+                    <span class="font-bold text-gray-900">{{ booking.turf.name }}</span>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-gray-500">Date</span>
+                    <span class="font-bold text-gray-900">{{ booking.booking_date|date:"F j, Y" }}</span>
+                </div>
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-gray-500">Time Layer</span>
+                    <span class="font-bold text-gray-900">{{ booking.start_time|time:"H:i" }} - {{
+                        booking.end_time|time:"H:i" }}</span>
+                </div>
+                <hr class="border-gray-200 my-4">
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-900 font-bold">Total Payable</span>
+                    <span class="text-2xl font-black text-indigo-600">₹{{ booking.total_amount }}</span>
+                </div>
+            </div>
+
+            <form method="post" class="space-y-4">
+                {% csrf_token %}
+                <button name="status" value="SUCCESS" type="submit"
+                    class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-2xl shadow-lg transition transform hover:-translate-y-1">
+                    Simulate Success Payment
+                </button>
+                <button name="status" value="FAILED" type="submit"
+                    class="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-4 rounded-2xl transition">
+                    Simulate Failed Payment
+                </button>
+            </form>
+
+            <p class="text-center text-xs text-gray-400 mt-6">
+                <i class="fas fa-lock mr-1"></i> SSL Encrypted Demo Transaction
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

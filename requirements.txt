@@ -1,0 +1,7 @@
+django>=4.2
+djangorestframework
+djangorestframework-simplejwt
+django-filter
+django-cors-headers
+Pillow
+psycopg2-binary # Optional, for production

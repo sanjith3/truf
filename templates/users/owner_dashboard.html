@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto py-10 px-4">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-gray-900">Partner Dashboard</h1>
+            <p class="text-gray-500">Welcome back, {{ user.phone_number }}</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <span class="bg-indigo-100 text-indigo-800 px-4 py-2 rounded-full text-sm font-bold">
+                {% if user.is_owner_approved %}
+                <i class="fas fa-check-circle mr-2"></i> Verified Partner
+                {% else %}
+                <i class="fas fa-clock mr-2"></i> Verification Pending
+                {% endif %}
+            </span>
+            {% if user.is_owner_approved %}
+            <a href="{% url 'turfs:add' %}"
+                class="bg-brand-600 hover:bg-brand-700 text-white px-6 py-2.5 rounded-xl font-bold transition shadow-lg hover:shadow-brand-200">
+                <i class="fas fa-plus mr-2"></i> Add Turf
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    {% if pending_approval %}
+    <!-- Pending Approval State -->
+    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-8 rounded-xl mb-8 shadow-sm">
+        <div class="flex items-start">
+            <div class="flex-shrink-0">
+                <i class="fas fa-exclamation-triangle text-yellow-400 text-3xl"></i>
+            </div>
+            <div class="ml-4">
+                <h3 class="text-xl font-bold text-yellow-800">Account Under Review</h3>
+                <p class="mt-2 text-yellow-700">
+                    Thanks for registering as a Turf Owner! Our admin team is currently reviewing your business details.
+                    Once approved, you can start listing your turfs and taking bookings.
+                </p>
+                <div class="mt-4 flex items-center gap-4 text-sm text-yellow-600">
+                    <span>Applied: <strong>{{ user.owner_application_date|date:"F j, Y" }}</strong></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Stats Row (Visible to all, but muted if pending) -->
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10 {% if pending_approval %}opacity-50{% endif %}">
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <div class="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center text-xl mb-4">
+                <i class="fas fa-futbol"></i>
+            </div>
+            <p class="text-gray-500 text-sm font-medium">Total Turfs</p>
+            <p class="text-2xl font-bold text-gray-900 mt-1">{{ turfs.count }}</p>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <div class="w-12 h-12 bg-green-50 text-green-600 rounded-xl flex items-center justify-center text-xl mb-4">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <p class="text-gray-500 text-sm font-medium">Total Bookings</p>
+            <p class="text-2xl font-bold text-gray-900 mt-1">0</p>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <div
+                class="w-12 h-12 bg-purple-50 text-purple-600 rounded-xl flex items-center justify-center text-xl mb-4">
+                <i class="fas fa-rupee-sign"></i>
+            </div>
+            <p class="text-gray-500 text-sm font-medium">Earnings (MTD)</p>
+            <p class="text-2xl font-bold text-gray-900 mt-1">₹0</p>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+            <div
+                class="w-12 h-12 bg-yellow-50 text-yellow-600 rounded-xl flex items-center justify-center text-xl mb-4">
+                <i class="fas fa-star"></i>
+            </div>
+            <p class="text-gray-500 text-sm font-medium">Average Rating</p>
+            <p class="text-2xl font-bold text-gray-900 mt-1">N/A</p>
+        </div>
+    </div>
+
+    {% if not pending_approval %}
+    <!-- My Turfs List -->
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden mb-10 border border-gray-100">
+        <div class="px-8 py-6 border-b border-gray-50">
+            <h3 class="text-xl font-bold text-gray-900">My Listings</h3>
+        </div>
+
+        <div class="divide-y divide-gray-50">
+            {% for turf in turfs %}
+            <div class="p-8 flex flex-col md:flex-row items-center justify-between hover:bg-gray-50 transition gap-6">
+                <div class="flex items-center flex-grow">
+                    {% if turf.images.first %}
+                    <img src="{{ turf.images.first.image.url }}"
+                        class="w-24 h-24 rounded-2xl object-cover mr-6 shadow-md">
+                    {% else %}
+                    <div class="w-24 h-24 bg-gray-100 rounded-2xl flex items-center justify-center mr-6 text-gray-400">
+                        <i class="fas fa-image text-2xl"></i>
+                    </div>
+                    {% endif %}
+                    <div>
+                        <div class="flex items-center gap-3 mb-1">
+                            <h4 class="text-xl font-bold text-gray-900">{{ turf.name }}</h4>
+                            {% if turf.is_active %}
+                            <span
+                                class="bg-green-100 text-green-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Live</span>
+                            {% else %}
+                            <span
+                                class="bg-gray-100 text-gray-500 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Under
+                                Review</span>
+                            {% endif %}
+                        </div>
+                        <p class="text-gray-500 flex items-center gap-2">
+                            <i class="fas fa-map-marker-alt text-brand-500"></i> {{ turf.city }}
+                        </p>
+                        <p class="text-indigo-600 font-bold mt-1">₹{{ turf.price_per_hour }}/hr</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-3 flex-shrink-0">
+                    <a href="{% url 'turfs:manage_images' turf.id %}"
+                        class="p-3 text-gray-500 hover:text-indigo-600 bg-gray-100 hover:bg-indigo-50 rounded-xl transition"
+                        title="Manage Photos">
+                        <i class="fas fa-camera"></i>
+                    </a>
+                    <a href="{% url 'turfs:edit' turf.id %}"
+                        class="p-3 text-gray-500 hover:text-brand-600 bg-gray-100 hover:bg-brand-50 rounded-xl transition"
+                        title="Edit Details">
+                        <i class="fas fa-edit"></i>
+                    </a>
+                    <a href="{% url 'turfs:detail' turf.id %}"
+                        class="px-6 py-3 bg-indigo-50 text-indigo-700 font-bold rounded-xl hover:bg-indigo-100 transition whitespace-nowrap">
+                        View Public Page
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+            <div class="p-20 text-center">
+                <div
+                    class="w-24 h-24 bg-indigo-50 text-indigo-400 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-gray-900">List Your First Turf</h3>
+                <p class="text-gray-500 mt-2 mb-8">Ready to grow your sports business? Add your venue details now.</p>
+                <a href="{% url 'turfs:add' %}"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-10 rounded-2xl shadow-lg transition transform hover:-translate-y-1">
+                    Get Started
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

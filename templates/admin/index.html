@@ -1,0 +1,251 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}
+{{ block.super }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    /* Global Reset & Typography */
+    :root {
+        --primary-color: #10b981;
+        /* Emerald 500 */
+        --primary-hover: #059669;
+        /* Emerald 600 */
+        --secondary-color: #1f2937;
+        /* Gray 800 */
+        --bg-color: #f3f4f6;
+        /* Gray 100 */
+        --text-color: #374151;
+        /* Gray 700 */
+        --card-bg: #ffffff;
+    }
+
+    body {
+        background-color: var(--bg-color);
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    /* HEADER */
+    #header {
+        background: var(--secondary-color);
+        color: #fff;
+        padding: 15px 30px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    #branding h1 {
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        color: #fff;
+    }
+
+    #branding h1 span {
+        color: var(--primary-color);
+    }
+
+    #user-tools {
+        font-weight: 500;
+    }
+
+    /* DASHBOARD KPIS */
+    .kpi-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 24px;
+        margin: 30px 0;
+    }
+
+    .kpi-card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        padding: 24px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        display: flex;
+        align-items: center;
+        transition: transform 0.2s;
+    }
+
+    .kpi-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    }
+
+    .kpi-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-right: 16px;
+    }
+
+    .kpi-blue {
+        background: #eff6ff;
+        color: #3b82f6;
+    }
+
+    .kpi-green {
+        background: #ecfdf5;
+        color: #10b981;
+    }
+
+    .kpi-yellow {
+        background: #fffbeb;
+        color: #f59e0b;
+    }
+
+    .kpi-red {
+        background: #fef2f2;
+        color: #ef4444;
+    }
+
+    .kpi-content div:first-child {
+        color: #6b7280;
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .kpi-content div:last-child {
+        color: #111827;
+        font-size: 1.875rem;
+        font-weight: 800;
+        line-height: 1.2;
+    }
+
+    /* APP MODULES */
+    .module {
+        background: var(--card-bg);
+        border-radius: 12px;
+        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+        margin-bottom: 30px;
+        overflow: hidden;
+        border: none;
+    }
+
+    .module caption {
+        background: var(--secondary-color);
+        padding: 12px 20px;
+        font-size: 1.1rem;
+        font-weight: 600;
+    }
+
+    .module caption a.section {
+        color: #fff;
+        text-decoration: none;
+    }
+
+    .module tr {
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .module td,
+    .module th {
+        padding: 16px 20px;
+        color: var(--text-color);
+        font-size: 0.95rem;
+    }
+
+    .module th a {
+        color: #111827;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .module td a {
+        color: var(--secondary-color);
+        font-weight: 500;
+    }
+
+    .viewlink,
+    .addlink,
+    .changelink {
+        color: var(--primary-color) !important;
+        font-weight: 600;
+    }
+
+    /* ACTIONS & BUTTONS */
+    .button,
+    input[type=submit],
+    input[type=button] {
+        background: var(--primary-color);
+        color: white;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        transition: background 0.2s;
+    }
+
+    .button:hover,
+    input[type=submit]:hover {
+        background: var(--primary-hover);
+    }
+
+    /* RECENT ACTIONS SIDEBAR - Hide or Style */
+    #content-related {
+        background: white;
+        padding: 20px;
+        border-radius: 12px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        margin-top: 30px;
+    }
+
+    #content-related h2 {
+        background: transparent;
+        color: #111827;
+        font-size: 1.2rem;
+        padding: 0 0 10px 0;
+        border-bottom: 2px solid #f3f4f6;
+    }
+</style>
+{% endblock %}
+
+{% block branding %}
+<h1 id="site-name"><a href="{% url 'admin:index' %}">Turf<span>Spot</span> Admin</a></h1>
+{% endblock %}
+
+{% block content %}
+<!-- KPI Dashboard -->
+<div class="kpi-container">
+    <div class="kpi-card">
+        <div class="kpi-icon kpi-blue"><i class="fas fa-users"></i></div>
+        <div class="kpi-content">
+            <div>Total Users</div>
+            <div>{{ kpi_data.total_users }}</div>
+        </div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-icon kpi-green"><i class="fas fa-futbol"></i></div>
+        <div class="kpi-content">
+            <div>Active Turfs</div>
+            <div>{{ kpi_data.total_turfs }}</div>
+        </div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-icon kpi-yellow"><i class="fas fa-clock"></i></div>
+        <div class="kpi-content">
+            <div>Today's Bookings</div>
+            <div>{{ kpi_data.today_bookings }}</div>
+        </div>
+    </div>
+
+    <div class="kpi-card">
+        <div class="kpi-icon kpi-red"><i class="fas fa-rupee-sign"></i></div>
+        <div class="kpi-content">
+            <div>Total Revenue</div>
+            <div>{{ kpi_data.total_revenue }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Standard Django Admin Content (App List) -->
+{{ block.super }}
+
+{% endblock %}

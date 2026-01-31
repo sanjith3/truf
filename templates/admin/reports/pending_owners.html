@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 p-8">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex justify-between items-center mb-10">
+            <div>
+                <a href="{% url 'core:platform_admin' %}"
+                    class="text-xs font-bold text-indigo-600 uppercase tracking-widest hover:underline">
+                    <i class="fas fa-arrow-left mr-1"></i> Back to Dashboard
+                </a>
+                <h1 class="text-3xl font-black text-gray-900 mt-2">{{ title }}</h1>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                        <tr>
+                            <th class="px-8 py-4">Applicant</th>
+                            <th class="px-8 py-4">Applied Date</th>
+                            <th class="px-8 py-4">Business Details</th>
+                            <th class="px-8 py-4 text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        {% for o in owners %}
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-8 py-6">
+                                <p class="text-sm font-bold text-gray-900">{{ o.phone_number }}</p>
+                            </td>
+                            <td class="px-8 py-6 text-sm text-gray-500">{{ o.owner_application_date|date:"d M Y H:i" }}
+                            </td>
+                            <td class="px-8 py-6">
+                                <p class="text-sm text-gray-700 font-bold">{{ o.owner_profile.business_name }}</p>
+                                <p class="text-xs text-gray-400">{{ o.owner_profile.city }} • {{
+                                    o.owner_profile.contact_email }}</p>
+                            </td>
+                            <td class="px-8 py-6 text-center">
+                                <a href="{% url 'core:approve_owner' o.id %}"
+                                    class="bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-bold px-4 py-2 rounded-lg transition shadow-md shadow-indigo-200">
+                                    Approve Now
+                                </a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="px-8 py-20 text-center text-gray-400">
+                                <i class="fas fa-check-circle fa-3x mb-4 block opacity-20"></i>
+                                All caught up! No pending applications.
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

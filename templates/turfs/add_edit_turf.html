@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto py-12 px-4">
+    <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+        <div class="bg-indigo-900 p-8 text-white">
+            <h1 class="text-3xl font-bold">{{ title }}</h1>
+            <p class="text-indigo-200 mt-2">Provide accurate details to attract more players.</p>
+        </div>
+
+        <form method="post" class="p-8 space-y-8">
+            {% csrf_token %}
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Basic Info -->
+                <div class="space-y-6">
+                    <h3 class="text-xl font-bold text-gray-800 border-b pb-2">Basic Information</h3>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Turf Name</label>
+                        {{ form.name }}
+                        {% if form.name.errors %}
+                        <p class="text-red-500 text-xs mt-1">{{ form.name.errors.0 }}</p>
+                        {% endif %}
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Price Per Hour (₹)</label>
+                        {{ form.price_per_hour }}
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
+                        {{ form.city }}
+                    </div>
+                </div>
+
+                <!-- Details & Sports -->
+                <div class="space-y-6">
+                    <h3 class="text-xl font-bold text-gray-800 border-b pb-2">Features & Sports</h3>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Available Sports</label>
+                        <div class="grid grid-cols-2 gap-2 p-4 bg-gray-50 rounded-xl">
+                            {{ form.sports }}
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Amenities</label>
+                        {{ form.amenities }}
+                        <p class="text-xs text-gray-500 mt-1">Comma separated (e.g. WiFi, Locker, Floodlights)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <h3 class="text-xl font-bold text-gray-800 border-b pb-2">Description & Location</h3>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    {{ form.description }}
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Full Address</label>
+                    {{ form.address }}
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end gap-4 pt-4 border-t">
+                <a href="{% url 'users:dashboard' %}" class="text-gray-600 hover:text-gray-800 font-medium">Cancel</a>
+                <button type="submit"
+                    class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-10 rounded-xl shadow-lg transition transform hover:-translate-y-0.5">
+                    Save Turf Details
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    /* Styling for the checkbox list */
+    ul#id_sports {
+        list-style: none;
+        padding: 0;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    ul#id_sports li {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.875rem;
+    }
+
+    ul#id_sports input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        border-radius: 4px;
+        border: 2px solid #ddd;
+        cursor: pointer;
+    }
+</style>
+{% endblock %}

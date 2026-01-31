@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="min-h-screen bg-gray-50 p-8">
+    <div class="max-w-6xl mx-auto">
+        <div class="flex justify-between items-center mb-10">
+            <div>
+                <a href="{% url 'core:platform_admin' %}"
+                    class="text-xs font-bold text-indigo-600 uppercase tracking-widest hover:underline">
+                    <i class="fas fa-arrow-left mr-1"></i> Back to Dashboard
+                </a>
+                <h1 class="text-3xl font-black text-gray-900 mt-2">{{ title }}</h1>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead class="bg-gray-50 text-[10px] font-black text-gray-400 uppercase tracking-widest">
+                        <tr>
+                            <th class="px-8 py-4">Transaction ID</th>
+                            <th class="px-8 py-4">User</th>
+                            <th class="px-8 py-4">Turf</th>
+                            <th class="px-8 py-4">Date</th>
+                            <th class="px-8 py-4">Amount</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        {% for p in payments %}
+                        <tr class="hover:bg-gray-50 transition-colors">
+                            <td class="px-8 py-6 font-mono text-xs font-bold text-indigo-600">ID: {{
+                                p.transaction_id|slice:":12" }}</td>
+                            <td class="px-8 py-6">
+                                <p class="text-sm font-bold text-gray-900">{{ p.booking.user.phone_number }}</p>
+                            </td>
+                            <td class="px-8 py-6 text-sm text-gray-700">{{ p.booking.turf.name }}</td>
+                            <td class="px-8 py-6 text-xs text-gray-500">{{ p.created_at|date:"d/m/Y H:i" }}</td>
+                            <td class="px-8 py-6 font-black text-gray-900">₹{{ p.amount }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

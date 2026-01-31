@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="relative bg-gray-900 overflow-hidden">
+    <!-- Abstract Background Pattern -->
+    <div class="absolute inset-0 opacity-20">
+        <svg class="h-full w-full text-brand-900" fill="currentColor" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <path d="M0 100 C 20 0 50 0 100 100 Z" />
+        </svg>
+    </div>
+
+    <!-- Partner CTA Badge (Top Right) -->
+    <div class="absolute top-4 right-4 z-20">
+        <a href="{% url 'users:register_owner' %}"
+            class="flex items-center gap-2 bg-white/10 backdrop-blur-md hover:bg-white/20 text-white px-4 py-2 rounded-full text-sm font-semibold transition border border-white/20 shadow-lg">
+            <i class="fas fa-handshake text-brand-400"></i>
+            <span>Own a Turf? Partner with Us</span>
+        </a>
+    </div>
+
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 relative z-10">
+        <div class="text-center">
+            <h1 class="text-4xl md:text-6xl font-extrabold text-white tracking-tight mb-6 fade-in">
+                Play More. <span class="text-brand-500">Wait Less.</span>
+            </h1>
+            <p class="text-xl text-gray-300 mb-10 max-w-2xl mx-auto fade-in delay-100">
+                Discover and book top-rated football and cricket turfs across Tamil Nadu & Kerala in seconds.
+            </p>
+
+            <!-- Quick Search Bar -->
+            <div
+                class="max-w-3xl mx-auto bg-white rounded-full p-2 shadow-2xl flex flex-col md:flex-row gap-2 fade-in delay-200">
+                <div
+                    class="flex-grow flex items-center px-4 md:px-6 py-2 md:py-0 border-b md:border-b-0 md:border-r border-gray-100">
+                    <i class="fas fa-map-marker-alt text-brand-500 mr-3 text-lg"></i>
+                    <input type="text" placeholder="Where do you want to play? (e.g. Kochi)"
+                        class="w-full bg-transparent focus:outline-none text-gray-700 placeholder-gray-400 h-12">
+                </div>
+                <a href="{% url 'turfs:list' %}"
+                    class="bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-8 rounded-full transition transform hover:scale-105 shadow-lg flex items-center justify-center">
+                    Search
+                </a>
+            </div>
+
+            <p class="mt-4 text-sm text-gray-400 fade-in delay-300">Popular: Chennai, Coimbatore, Kochi, Trivandrum</p>
+        </div>
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="py-20 bg-gray-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-16">
+            <h2 class="text-3xl font-bold text-gray-900">Why Players Love TurfSpot</h2>
+            <p class="mt-4 text-gray-600">Built for the passionate sports community.</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <!-- Card 1 -->
+            <div
+                class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition duration-300 border border-gray-100 group">
+                <div
+                    class="w-16 h-16 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition">
+                    <i class="fas fa-search-location"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">Instant Discovery</h3>
+                <p class="text-gray-600 leading-relaxed">Find available grounds near you instantly with our real-time
+                    location filter.</p>
+            </div>
+
+            <!-- Card 2 -->
+            <div
+                class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition duration-300 border border-gray-100 group">
+                <div
+                    class="w-16 h-16 bg-green-50 text-green-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">Fast & Easy Booking</h3>
+                <p class="text-gray-600 leading-relaxed">Check slots, confirm availability, and lock your game time in
+                    under 30 seconds.</p>
+            </div>
+
+            <!-- Card 3 -->
+            <div
+                class="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition duration-300 border border-gray-100 group">
+                <div
+                    class="w-16 h-16 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center text-2xl mb-6 group-hover:scale-110 transition">
+                    <i class="fas fa-users"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-3">Community First</h3>
+                <p class="text-gray-600 leading-relaxed">Join thousands of players in Tamil Nadu & Kerala enjoying
+                    hassle-free games.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- CTA Section -->
+<div class="bg-brand-600 py-16">
+    <div class="max-w-5xl mx-auto px-4 text-center">
+        <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">Ready to hit the ground?</h2>
+        <p class="text-brand-100 text-lg mb-8">Join the fastest growing sports community today.</p>
+        <div class="flex flex-col md:flex-row gap-4 justify-center">
+            <a href="{% url 'turfs:list' %}"
+                class="inline-block bg-white text-brand-900 font-bold py-4 px-10 rounded-full shadow-lg hover:bg-gray-100 transition transform hover:-translate-y-1">
+                Book a Slot Now
+            </a>
+            <a href="{% url 'users:register_owner' %}"
+                class="inline-block bg-brand-700 border border-brand-500 text-white font-bold py-4 px-10 rounded-full shadow-lg hover:bg-brand-800 transition transform hover:-translate-y-1">
+                Register as Owner
+            </a>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

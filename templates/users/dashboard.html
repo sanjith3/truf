@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="space-y-6">
+    <div class="flex justify-between items-center">
+        <h1 class="text-3xl font-bold text-gray-800">My Dashboard</h1>
+        {% if user.is_turf_owner %}
+        <span class="bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm font-semibold">Owner Account</span>
+        {% else %}
+        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-semibold">Player Account</span>
+        {% endif %}
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-xl font-semibold mb-4">My Bookings</h2>
+        {% if bookings %}
+        <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                    <tr>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Turf
+                        </th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date
+                            & Time</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Status</th>
+                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Amount</th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    {% for booking in bookings %}
+                    <tr>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ booking.turf.name }}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">{{ booking.booking_date }} | {{ booking.start_time }}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span
+                                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                    {% if booking.status == 'CONFIRMED' %}bg-green-100 text-green-800{% elif booking.status == 'PENDING' %}bg-yellow-100 text-yellow-800{% else %}bg-red-100 text-red-800{% endif %}">
+                                {{ booking.status }}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap">₹{{ booking.total_amount }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-gray-500">No bookings yet. <a href="{% url 'turfs:list' %}"
+                class="text-indigo-600 hover:text-indigo-900">Book a turf now!</a></p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
