@@ -1,43 +1,125 @@
-/* Custom Animations */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+/* --- Design Tokens --- */
+:root {
+    --brand-50: #fef2f2;
+    --brand-500: #ef4444;
+    --brand-600: #dc2626;
+    --brand-900: #7f1d1d;
+
+    --luxury-shadow: 0 10px 50px -12px rgba(0, 0, 0, 0.12);
+    --inner-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+    --haptic-transition: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.fade-in {
-    animation: fadeIn 0.5s ease-out forwards;
+/* --- Base Enhancements --- */
+body {
+    -webkit-tap-highlight-color: transparent;
+    scroll-behavior: smooth;
 }
 
-.delay-100 { animation-delay: 0.1s; }
-.delay-200 { animation-delay: 0.2s; }
-.delay-300 { animation-delay: 0.3s; }
+/* --- Custom Animations --- */
+@keyframes fadeInSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
 
-/* Custom Scrollbar for modern look */
-::-webkit-scrollbar {
-    width: 8px;
-}
-::-webkit-scrollbar-track {
-    background: #f1f1f1; 
-}
-::-webkit-scrollbar-thumb {
-    background: #888; 
-    border-radius: 4px;
-}
-::-webkit-scrollbar-thumb:hover {
-    background: #555; 
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
-/* Glassmorphism utilities */
+@keyframes pulseBorder {
+    0% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(239, 68, 68, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+    }
+}
+
+.fade-in-up {
+    animation: fadeInSlideUp 0.6s var(--haptic-transition) forwards;
+}
+
+/* --- Mobile-First Touch States --- */
+.touch-active:active {
+    transform: scale(0.96);
+    transition: transform 0.1s var(--haptic-transition);
+}
+
+/* --- Premium Components --- */
+.card-premium {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    box-shadow: var(--luxury-shadow);
+    transition: all 0.3s var(--haptic-transition);
+}
+
+.card-premium:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 60px -15px rgba(0, 0, 0, 0.15);
+}
+
 .glass {
-    background: rgba(255, 255, 255, 0.9);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .glass-dark {
-    background: rgba(17, 24, 39, 0.8);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(17, 24, 39, 0.75);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* --- Quick Filter Scroll (Mobile) --- */
+.hide-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+
+.hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* --- Status Indicators --- */
+.status-pulse {
+    position: relative;
+}
+
+.status-pulse::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    border-radius: inherit;
+    animation: pulseBorder 2s infinite;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 0, 0, 0.2);
 }

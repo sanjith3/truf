@@ -20,116 +20,82 @@
         </a>
     </div>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 md:py-32 relative z-10">
-        <div class="text-center">
-            <h1 class="text-4xl md:text-6xl font-extrabold text-white tracking-tight mb-6 fade-in">
-                Play More. <span class="text-brand-500">Wait Less.</span>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-40 relative z-10 flex flex-col items-center">
+        <div class="text-center max-w-3xl">
+            <h1 class="text-5xl md:text-7xl font-black text-white tracking-tight mb-8 fade-in-up">
+                Book Turf, <br><span class="text-brand-500">Play Game.</span>
             </h1>
-            <p class="text-xl text-gray-300 mb-10 max-w-2xl mx-auto fade-in delay-100">
-                Discover and book top-rated football and cricket turfs across Tamil Nadu & Kerala in seconds.
+            <p class="text-lg md:text-xl text-gray-400 mb-12 font-medium fade-in-up" style="animation-delay: 0.1s">
+                India's fastest platform to book football & cricket turfs. <br class="hidden md:block">
+                No calls. No waiting. Just Play.
             </p>
 
             <!-- Quick Search Bar -->
-            <div class="max-w-4xl mx-auto flex flex-col gap-4 fade-in delay-200">
-                <div class="bg-white rounded-2xl md:rounded-full p-2 shadow-2xl flex flex-col md:flex-row gap-2">
-                    <div
-                        class="flex-grow flex items-center px-4 md:px-6 py-2 md:py-0 border-b md:border-b-0 md:border-r border-gray-100">
-                        <i class="fas fa-map-marker-alt text-brand-500 mr-3 text-lg"></i>
-                        <input type="text" id="cityInput" placeholder="Where do you want to play? (e.g. Kochi)"
-                            class="w-full bg-transparent focus:outline-none text-gray-700 placeholder-gray-400 h-12">
+            <div class="w-full mb-8 fade-in-up" style="animation-delay: 0.2s">
+                <div class="bg-white rounded-3xl p-3 shadow-2xl flex flex-col md:flex-row gap-2">
+                    <div class="flex-grow flex items-center px-6 py-2">
+                        <i class="fas fa-search text-gray-400 mr-4 text-xl"></i>
+                        <input type="text" id="cityInput" placeholder="Enter your city (e.g. Kochi, Chennai)"
+                            class="w-full bg-transparent focus:outline-none text-gray-900 font-bold placeholder-gray-400 h-14 text-lg">
                     </div>
-                    <div class="flex gap-2 p-1">
+                    <div class="flex gap-2">
                         <button onclick="searchByCity()"
-                            class="flex-grow md:flex-none bg-brand-600 hover:bg-brand-700 text-white font-bold py-3 px-8 rounded-xl md:rounded-full transition transform hover:scale-105 shadow-lg flex items-center justify-center">
-                            Search
+                            class="flex-grow md:flex-none bg-brand-600 hover:bg-brand-700 text-white font-black py-4 px-10 rounded-2xl transition-all shadow-xl shadow-brand-500/20 text-lg touch-active">
+                            Find Now
                         </button>
                         <button onclick="searchNearby()" id="nearbyBtn"
-                            class="bg-indigo-50 text-indigo-600 hover:bg-indigo-100 font-bold py-3 px-6 rounded-xl md:rounded-full transition flex items-center justify-center gap-2"
-                            title="Find turfs near your current location">
-                            <i class="fas fa-location-arrow"></i>
-                            <span class="md:hidden lg:inline">Near Me</span>
+                            class="bg-gray-100 text-gray-900 hover:bg-gray-200 font-black py-4 px-6 rounded-2xl transition flex items-center justify-center gap-2 touch-active">
+                            <i class="fas fa-location-crosshairs text-brand-600"></i>
                         </button>
                     </div>
                 </div>
             </div>
 
-            <!-- AD Placement: HOME BANNER -->
-            {% if banner_ad %}
-            <div class="mt-16 max-w-5xl mx-auto px-4 fade-in delay-300">
-                <a href="{% url 'ads:redirect' banner_ad.id %}" target="_blank"
-                    class="block relative group overflow-hidden rounded-3xl border-4 border-white/5 shadow-2xl transition hover:border-brand-500/30">
-                    <div class="absolute top-4 left-4 z-20 flex items-center gap-2">
-                        <span
-                            class="bg-black/40 backdrop-blur-md text-white text-[10px] font-black px-2 py-0.5 rounded-md uppercase tracking-widest border border-white/10">Sponsored</span>
-                    </div>
-                    {% if banner_ad.image %}
-                    <img src="{{ banner_ad.image.url }}" alt="{{ banner_ad.title }}"
-                        class="w-full h-48 md:h-64 object-cover transition duration-700 group-hover:scale-105">
-                    {% else %}
-                    <div
-                        class="w-full h-48 md:h-64 bg-gradient-to-r from-indigo-900 via-brand-900 to-indigo-950 flex flex-col items-center justify-center text-center p-8">
-                        <h3 class="text-2xl md:text-3xl font-black text-white mb-2">{{ banner_ad.title }}</h3>
-                        <p class="text-brand-300 font-bold uppercase tracking-widest text-sm">Special Promotion</p>
-                    </div>
-                    {% endif %}
-                    <div
-                        class="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-6 pt-12">
-                        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                            <div>
-                                <p class="text-white font-black text-xl">{{ banner_ad.title }}</p>
-                                <p class="text-gray-300 text-xs mt-1">{{ banner_ad.advertiser_name }} • Exclusive Event
-                                </p>
-                            </div>
-                            <span
-                                class="inline-flex items-center gap-2 bg-brand-500 text-white font-black px-6 py-2 rounded-full text-sm shadow-xl shadow-brand-500/40">
-                                View Deal <i class="fas fa-arrow-right"></i>
-                            </span>
-                        </div>
-                    </div>
+            <!-- Quick Filter Chips (UX Decision: Reduced thinking) -->
+            <div class="flex flex-wrap justify-center gap-3 overflow-x-auto pb-4 fade-in-up hide-scrollbar"
+                style="animation-delay: 0.3s">
+                <a href="{% url 'turfs:list' %}?filter=today"
+                    class="whitespace-nowrap bg-white/10 backdrop-blur-md border border-white/10 text-white font-bold py-2.5 px-6 rounded-full hover:bg-white/20 transition touch-active">
+                    <i class="fas fa-calendar-star mr-2 text-brand-400"></i> Slots for Today
+                </a>
+                <a href="{% url 'turfs:list' %}?filter=evening"
+                    class="whitespace-nowrap bg-white/10 backdrop-blur-md border border-white/10 text-white font-bold py-2.5 px-6 rounded-full hover:bg-white/20 transition touch-active">
+                    <i class="fas fa-moon mr-2 text-indigo-400"></i> Night Matches
+                </a>
+                <a href="{% url 'turfs:list' %}?filter=price_low"
+                    class="whitespace-nowrap bg-white/10 backdrop-blur-md border border-white/10 text-white font-bold py-2.5 px-6 rounded-full hover:bg-white/20 transition touch-active">
+                    <i class="fas fa-wallet mr-2 text-green-400"></i> Under ₹1000
+                </a>
+                <a href="{% url 'turfs:list' %}?filter=5v5"
+                    class="whitespace-nowrap bg-white/10 backdrop-blur-md border border-white/10 text-white font-bold py-2.5 px-6 rounded-full hover:bg-white/20 transition touch-active">
+                    <i class="fas fa-futbol mr-2 text-blue-400"></i> 5-v-5 Only
                 </a>
             </div>
-            {% endif %}
+
             <script>
                 function searchByCity() {
                     const city = document.getElementById('cityInput').value;
-                    if (city) {
-                        window.location.href = `{% url 'turfs:list' %}?city=${encodeURIComponent(city)}`;
-                    } else {
-                        window.location.href = "{% url 'turfs:list' %}";
-                    }
+                    window.location.href = `{% url 'turfs:list' %}?city=${encodeURIComponent(city)}`;
                 }
 
                 function searchNearby() {
                     const btn = document.getElementById('nearbyBtn');
-                    const originalContent = btn.innerHTML;
-
-                    if (!navigator.geolocation) {
-                        alert("Geolocation is not supported by your browser");
-                        return;
-                    }
-
-                    btn.disabled = true;
-                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Locating...';
-
-                    navigator.geolocation.getCurrentPosition(
-                        (position) => {
-                            const lat = position.coords.latitude;
-                            const long = position.coords.longitude;
-                            window.location.href = `{% url 'turfs:list' %}?lat=${lat}&long=${long}&radius=10`;
-                        },
-                        (error) => {
-                            btn.disabled = false;
-                            btn.innerHTML = originalContent;
-                            alert("Unable to retrieve your location. Please check browser permissions.");
-                        },
-                        { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
-                    );
+                    if (!navigator.geolocation) return alert("Location not supported");
+                    btn.innerHTML = '<i class="fas fa-circle-notch fa-spin text-brand-600"></i>';
+                    navigator.geolocation.getCurrentPosition((p) => {
+                        window.location.href = `{% url 'turfs:list' %}?lat=${p.coords.latitude}&long=${p.coords.longitude}&radius=10`;
+                    }, () => {
+                        btn.innerHTML = '<i class="fas fa-location-crosshairs text-brand-600"></i>';
+                        alert("Enable location to see nearby turfs");
+                    });
                 }
             </script>
-
-            <p class="mt-4 text-sm text-gray-400 fade-in delay-300">Popular: Chennai, Coimbatore, Kochi, Trivandrum</p>
         </div>
     </div>
+
+    <p class="mt-4 text-sm text-gray-400 fade-in delay-300">Popular: Chennai, Coimbatore, Kochi, Trivandrum</p>
+</div>
+</div>
 </div>
 
 <!-- Features Section -->

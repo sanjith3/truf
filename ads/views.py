@@ -6,6 +6,7 @@ from .models import AdCampaign
 from .forms import AdCampaignForm
 from .services import AdService
 from decimal import Decimal
+from core.decorators import ads_required
 
 def ad_redirect(request, ad_id):
     """
@@ -23,6 +24,7 @@ def ad_redirect(request, ad_id):
     return redirect(ad.redirect_url)
 
 @login_required
+@ads_required
 @user_passes_test(lambda u: u.is_staff or u.is_turf_owner)
 def advertiser_dashboard(request):
     """
@@ -47,6 +49,7 @@ def advertiser_dashboard(request):
     return render(request, 'ads/advertiser_dashboard.html', context)
 
 @login_required
+@ads_required
 @user_passes_test(lambda u: u.is_staff or u.is_turf_owner)
 def campaign_create(request):
     if request.method == 'POST':
@@ -64,6 +67,7 @@ def campaign_create(request):
     return render(request, 'ads/campaign_form.html', {'form': form, 'title': 'Launch New Campaign'})
 
 @login_required
+@ads_required
 @user_passes_test(lambda u: u.is_staff or u.is_turf_owner)
 def campaign_detail(request, campaign_id):
     """Detailed analytics for a specific campaign."""

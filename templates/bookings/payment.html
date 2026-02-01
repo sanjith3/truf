@@ -2,51 +2,83 @@
 {% block content %}
 <div class="max-xl mx-auto py-12 px-4">
     <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
-        <div class="bg-indigo-900 p-8 text-white text-center">
-            <h1 class="text-2xl font-bold">Secure Payment</h1>
-            <p class="text-indigo-200 mt-2">Demo Gateway - No real money needed</p>
-        </div>
-        <div class="p-8">
-            <div class="bg-gray-50 rounded-2xl p-6 mb-8">
-                <div class="flex justify-between items-center mb-4">
-                    <span class="text-gray-500">Venue</span>
-                    <span class="font-bold text-gray-900">{{ booking.turf.name }}</span>
-                </div>
-                <div class="flex justify-between items-center mb-2">
-                    <span class="text-gray-500">Booking Amount</span>
-                    <span class="font-bold text-gray-900">₹{{ booking.base_amount }}</span>
-                </div>
-                <div class="flex justify-between items-center mb-4">
-                    <span class="text-gray-500">Convenience Fee</span>
-                    <span class="font-bold text-indigo-600">+ ₹{{ booking.convenience_fee }}</span>
-                </div>
-                <div class="flex justify-between items-center mb-4">
-                    <span class="text-gray-500">Date</span>
-                    <span class="font-bold text-gray-900">{{ booking.booking_date|date:"F j, Y" }}</span>
-                </div>
-                <div class="flex justify-between items-center mb-4">
-                    <span class="text-gray-500">Time Layer</span>
-                    <span class="font-bold text-gray-900">
-                        {{ booking.start_time|time:"H:i" }} - {{ booking.end_time|time:"H:i" }}
-                    </span>
-                </div>
-                <hr class="border-gray-200 my-4">
-                <div class="flex justify-between items-center">
-                    <span class="text-gray-900 font-bold">Total Payable</span>
-                    <span class="text-2xl font-black text-indigo-600">₹{{ booking.total_amount }}</span>
+        <div class="bg-gray-900 p-8 text-white text-center relative overflow-hidden">
+            <div class="absolute top-0 right-0 p-4">
+                <div
+                    class="bg-white/10 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 flex items-center gap-2">
+                    <i class="fas fa-clock text-brand-500 animate-pulse"></i>
+                    <span id="timer" class="text-sm font-black tabular-nums">10:00</span>
                 </div>
             </div>
+            <h1 class="text-2xl font-bold">Secure Payment</h1>
+            <p class="text-gray-400 mt-2 text-sm">Hold Tight! Your slot is reserved for 10 minutes.</p>
+        </div>
+
+        <script>
+            // Simple UX Timer
+            let seconds = 600;
+            const timerEl = document.getElementById('timer');
+            const interval = setInterval(() => {
+                seconds--;
+                const m = Math.floor(seconds / 60);
+                const s = seconds % 60;
+                timerEl.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+                if (seconds <= 0) {
+                    clearInterval(interval);
+                    alert("Reservation expired! Please pick the slot again.");
+                    window.location.reload();
+                }
+            }, 1000);
+        </script>
+        <div class="p-8">
+            <div class="bg-gray-50 rounded-3xl p-8 mb-10 border border-gray-100">
+                <div class="flex justify-between items-center mb-6">
+                    <span class="text-gray-500 font-bold uppercase text-[10px] tracking-widest">Venue Details</span>
+                    <span class="font-black text-gray-900 text-lg">{{ booking.turf.name }}</span>
+                </div>
+                <div class="space-y-4 mb-8">
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-500">Booking Date</span>
+                        <span class="font-black text-gray-900">{{ booking.booking_date|date:"l, d M Y" }}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-500">Reserved Slot</span>
+                        <span class="font-black text-brand-600">{{ booking.start_time|date:"g:i A" }} to {{
+                            booking.end_time|date:"g:i A" }}</span>
+                    </div>
+                </div>
+
+                <div class="space-y-3 pt-6 border-t border-gray-200">
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-500">Turf Fee</span>
+                        <span class="font-bold text-gray-900">₹{{ booking.base_amount }}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-500">Convenience Fee</span>
+                        <span class="font-bold text-gray-900">₹{{ booking.convenience_fee }}</span>
+                    </div>
+                    <div class="flex justify-between items-center pt-4">
+                        <span class="text-gray-900 font-black text-lg">Total Amount</span>
+                        <span class="text-3xl font-black text-gray-900">₹{{ booking.total_amount }}</span>
+                    </div>
+                </div>
+            </div>
+
             <form method="post" class="space-y-4">
                 {% csrf_token %}
                 <button name="status" value="SUCCESS" type="submit"
-                    class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-4 rounded-2xl shadow-lg transition transform hover:-translate-y-1">Simulate
-                    Success Payment</button>
-                <button name="status" value="FAILED" type="submit"
-                    class="w-full bg-gray-100 hover:bg-gray-200 text-gray-600 font-bold py-4 rounded-2xl transition">Simulate
-                    Failed Payment</button>
+                    class="w-full bg-gray-900 hover:bg-black text-white font-black py-5 rounded-2xl shadow-2xl transition transform active:scale-95 flex items-center justify-center gap-3">
+                    <i class="fas fa-lock text-sm opacity-50"></i> Pay & Book Now
+                </button>
+                <div class="flex items-center justify-center gap-4 py-2 opacity-40">
+                    <i class="fab fa-cc-visa text-2xl"></i>
+                    <i class="fab fa-cc-mastercard text-2xl"></i>
+                    <i class="fas fa-qrcode text-xl"></i>
+                </div>
             </form>
-            <p class="text-center text-xs text-gray-400 mt-6"><i class="fas fa-lock mr-1"></i> SSL Encrypted Demo
-                Transaction</p>
+            <p class="text-center text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-6">
+                Instant Confirmation <span class="mx-2">•</span> 100% Secure
+            </p>
         </div>
     </div>
 </div>

@@ -40,6 +40,7 @@ class Booking(models.Model):
     platform_commission = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'), help_text="10% cut from base_amount")
     owner_earnings = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
     
+    expires_at = models.DateTimeField(null=True, blank=True, help_text="Time until which this reservation is held")
     created_at = models.DateTimeField(auto_now_add=True)
 
     def calculate_fees(self):

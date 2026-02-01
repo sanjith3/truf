@@ -37,21 +37,12 @@
                                 <p class="text-xs text-gray-400">{{ o.owner_profile.city }} • {{
                                     o.owner_profile.contact_email }}</p>
                             </td>
-                            <div class="flex gap-2 justify-center">
+                            <td class="px-8 py-6 text-center">
                                 <a href="{% url 'core:review_application' o.id %}"
-                                    class="bg-blue-600 hover:bg-blue-700 text-white text-[10px] font-bold px-4 py-2 rounded-lg transition shadow-md shadow-blue-200">
-                                    <i class="fas fa-eye mr-1"></i> Review Details
+                                    class="inline-flex items-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition shadow-lg shadow-indigo-100 transform hover:-translate-y-0.5">
+                                    <span>Review Application</span>
+                                    <i class="fas fa-arrow-right"></i>
                                 </a>
-                                <form method="post" action="{% url 'core:approve_owner' o.id %}"
-                                    style="display: inline;">
-                                    {% csrf_token %}
-                                    <button type="submit"
-                                        class="bg-green-600 hover:bg-green-700 text-white text-[10px] font-bold px-4 py-2 rounded-lg transition shadow-md shadow-green-200"
-                                        onclick="return confirm('Approve this turf owner and activate their turf?')">
-                                        <i class="fas fa-check mr-1"></i> Approve
-                                    </button>
-                                </form>
-                            </div>
                             </td>
                         </tr>
                         {% empty %}

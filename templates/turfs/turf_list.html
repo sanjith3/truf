@@ -64,63 +64,83 @@
         {% endif %}
 
         {% for turf in turfs %}
-        <div
-            class="bg-white rounded-2xl shadow-sm hover:shadow-xl transition duration-300 overflow-hidden border-2 {% if turf.owner.subscription.plan.tier == 2 %}border-amber-400 shadow-amber-50{% elif turf.owner.subscription.plan.tier == 1 %}border-indigo-100 shadow-indigo-50{% else %}border-gray-100{% endif %} flex flex-col h-full group relative">
+        <div class="card-premium rounded-3xl overflow-hidden flex flex-col h-full group relative fade-in-up">
 
-            <!-- Subscription Badges -->
-            {% if turf.owner.subscription.plan.tier == 2 %}
-            <div class="absolute top-4 left-4 z-20">
-                <span
-                    class="bg-amber-400 text-amber-950 text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-widest border border-amber-500/20 shadow-lg flex items-center gap-1">
-                    <i class="fas fa-crown"></i> Prime Venue
-                </span>
+            <!-- Price Chip -->
+            <div class="absolute top-4 right-4 z-20">
+                <div class="glass px-4 py-2 rounded-2xl text-sm font-black text-gray-900 shadow-xl">
+                    ₹{{ turf.price_per_hour }}<span class="text-[10px] font-bold text-gray-500 uppercase ml-1">/
+                        hr</span>
+                </div>
             </div>
-            {% elif turf.owner.subscription.plan.tier == 1 %}
+
+            <!-- Status Badge -->
             <div class="absolute top-4 left-4 z-20">
+                {% if turf.show_closed_badge or turf.emergency_block.is_blocked %}
                 <span
-                    class="bg-indigo-600 text-white text-[10px] font-black px-2 py-1 rounded-md uppercase tracking-widest shadow-lg flex items-center gap-1">
-                    <i class="fas fa-star"></i> Featured
+                    class="bg-amber-100/90 backdrop-blur-md text-amber-700 text-[10px] font-black px-3 py-1.5 rounded-xl uppercase tracking-widest shadow-lg border border-amber-200">
+                    Closed Today
                 </span>
+                {% else %}
+                <span
+                    class="bg-green-100/90 backdrop-blur-md text-green-700 text-[10px] font-black px-3 py-1.5 rounded-xl uppercase tracking-widest shadow-lg border border-green-200 flex items-center gap-1.5">
+                    <span class="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span> Open Today
+                </span>
+                {% endif %}
             </div>
-            {% endif %}
 
             <!-- Image Area -->
-            <div class="relative h-56 bg-gray-200 overflow-hidden">
+            <div class="relative h-64 bg-gray-100 overflow-hidden">
                 {% if turf.images.first %}
                 <img src="{{ turf.images.first.image.url }}" alt="{{ turf.name }}"
-                    class="h-full w-full object-cover transform group-hover:scale-110 transition duration-700">
+                    class="h-full w-full object-cover transform group-hover:scale-105 transition duration-700">
                 {% else %}
-                <div class="h-full w-full flex flex-col items-center justify-center text-gray-400 bg-gray-100">
-                    <i class="fas fa-image fa-3x mb-2"></i>
-                    <span class="text-sm">No Image</span>
+                <div class="h-full w-full flex flex-col items-center justify-center text-gray-300">
+                    <i class="fas fa-image text-4xl mb-2"></i>
                 </div>
                 {% endif %}
-                <div
-                    class="absolute top-4 right-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-sm font-bold text-gray-900 shadow-sm">
-                    ₹{{ turf.price_per_hour }}<span class="text-xs font-normal text-gray-500">/hr</span>
-                </div>
+                <div class="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
             </div>
 
             <!-- Content Area -->
             <div class="p-6 flex flex-col flex-grow">
-                <h3 class="text-xl font-bold text-gray-900 leading-tight group-hover:text-brand-600 transition">
-                    {{ turf.name }}
-                </h3>
-                <p class="text-gray-500 text-sm mb-4 flex items-center justify-between">
-                    <span><i class="fas fa-map-marker-alt text-red-500 mr-2"></i> {{ turf.city }}</span>
+                <div class="flex justify-between items-start mb-2">
+                    <h3 class="text-xl font-black text-gray-900 leading-tight group-hover:text-brand-600 transition">
+                        {{ turf.name }}
+                    </h3>
+                </div>
+
+                <p class="text-gray-500 text-sm mb-6 flex items-center gap-3">
+                    <span class="flex items-center gap-1">
+                        <i class="fas fa-map-marker-alt text-brand-500"></i> {{ turf.city }}
+                    </span>
                     {% if turf.distance %}
-                    <span class="text-indigo-600 font-bold bg-indigo-50 px-2 py-0.5 rounded text-xs">
-                        <i class="fas fa-location-arrow mr-1"></i> {{ turf.distance|floatformat:1 }} km away
+                    <span class="w-1 h-1 bg-gray-300 rounded-full"></span>
+                    <span class="text-indigo-600 font-black">
+                        {{ turf.distance|floatformat:1 }} km away
                     </span>
                     {% endif %}
                 </p>
 
+                <!-- Professional UX: Next Available Slot -->
+                {% if not turf.show_closed_badge and turf.next_available_slot %}
+                <div
+                    class="mb-6 p-4 bg-gray-50 rounded-2xl border border-gray-100 group-hover:bg-brand-50 group-hover:border-brand-100 transition">
+                    <p class="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">Next Available Slot
+                    </p>
+                    <p class="text-sm font-bold text-gray-700 flex items-center gap-2">
+                        <i class="fas fa-bolt text-amber-500"></i> {{ turf.next_available_slot.start|date:"g:i A" }}
+                        Today
+                    </p>
+                </div>
+                {% endif %}
+
                 <!-- Sports Tags -->
-                <div class="flex flex-wrap gap-2 mb-6">
-                    {% for sport in turf.sports.all %}
+                <div class="flex flex-wrap gap-2 mb-8">
+                    {% for sport in turf.sports.all|slice:":3" %}
                     <span
-                        class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-brand-50 text-brand-700 border border-brand-100">
-                        {% if sport.icon %}<i class="fas {{ sport.icon }} mr-1"></i>{% endif %} {{ sport.name }}
+                        class="px-2 py-1 bg-gray-100 text-gray-600 rounded-lg text-[10px] font-black uppercase tracking-tight">
+                        {{ sport.name }}
                     </span>
                     {% endfor %}
                 </div>
@@ -128,8 +148,8 @@
                 <!-- Action Button -->
                 <div class="mt-auto">
                     <a href="{% url 'turfs:detail' turf.id %}"
-                        class="block w-full text-center bg-gray-900 hover:bg-brand-600 text-white font-semibold py-3 rounded-xl transition shadow-md hover:shadow-lg">
-                        View Details
+                        class="block w-full text-center bg-gray-900 hover:bg-brand-600 text-white font-black py-4 rounded-2xl transition transform active:scale-95 shadow-xl hover:shadow-brand-200">
+                        Book Now <i class="fas fa-chevron-right ml-2 text-xs opacity-50"></i>
                     </a>
                 </div>
             </div>

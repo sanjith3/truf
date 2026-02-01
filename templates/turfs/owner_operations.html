@@ -1,0 +1,230 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="max-w-7xl mx-auto py-10 px-4">
+    <!-- Header -->
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-10 gap-6">
+        <div>
+            <h1 class="text-3xl font-black text-gray-900 flex items-center gap-3">
+                <i class="fas fa-sliders-h text-brand-600"></i> Operations Center
+            </h1>
+            <p class="text-gray-500 font-medium mt-1">Manage availability and status for <span
+                    class="text-gray-900 font-bold">{{ turf.name }}</span></p>
+        </div>
+        <div class="flex items-center gap-4">
+            <a href="{% url 'users:dashboard' %}"
+                class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-xl font-bold transition">
+                <i class="fas fa-chevron-left mr-2"></i> Dashboard
+            </a>
+            <a href="{% url 'turfs:detail' turf.id %}" target="_blank"
+                class="bg-indigo-50 text-indigo-700 px-6 py-3 rounded-xl font-bold hover:bg-indigo-100 transition">
+                View Public Page <i class="fas fa-external-link-alt ml-2 text-xs"></i>
+            </a>
+        </div>
+    </div>
+
+    <!-- Quick Actions Row (Status & Emergency) -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10">
+        <!-- Today's Status -->
+        <div
+            class="bg-white p-8 rounded-3xl shadow-xl border {% if turf.is_open_today %}border-green-100{% else %}border-amber-100{% endif %} flex flex-col justify-between">
+            <div class="flex justify-between items-start mb-6">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-900">Today's Status</h3>
+                    <p class="text-gray-500 text-sm">Quickly open or close for the remaining day.</p>
+                </div>
+                {% if turf.is_open_today %}
+                <span
+                    class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider">Accepting
+                    Bookings</span>
+                {% else %}
+                <span
+                    class="bg-amber-100 text-amber-700 px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider">Closed
+                    Today</span>
+                {% endif %}
+            </div>
+
+            <form action="{% url 'turfs:toggle_status' turf.id %}" method="post" class="flex flex-col gap-4">
+                {% csrf_token %}
+                {% if turf.is_open_today %}
+                <input type="text" name="reason" placeholder="Reason for closing (optional)"
+                    class="bg-gray-50 border border-gray-100 px-4 py-3 rounded-xl text-sm focus:ring-2 focus:ring-amber-500 outline-none">
+                <button type="submit"
+                    class="w-full bg-amber-500 hover:bg-amber-600 text-white font-black py-4 rounded-2xl transition shadow-lg shadow-amber-200">
+                    Close Facility for Today
+                </button>
+                {% else %}
+                <button type="submit"
+                    class="w-full bg-green-600 hover:bg-green-700 text-white font-black py-4 rounded-2xl transition shadow-lg shadow-green-200">
+                    Reopen Facility Now
+                </button>
+                {% endif %}
+            </form>
+        </div>
+
+        <!-- Emergency Block -->
+        <div class="bg-gray-900 p-8 rounded-3xl shadow-2xl relative overflow-hidden group">
+            <div class="absolute right-0 top-0 p-8 opacity-10 transform group-hover:scale-110 transition duration-500">
+                <i class="fas fa-radiation text-white text-9xl"></i>
+            </div>
+            <div class="relative z-10">
+                <h3 class="text-xl font-bold text-white mb-2">Emergency Kill-Switch</h3>
+                <p class="text-gray-400 text-sm mb-6">Instantly block all new bookings for immediate operational stops.
+                </p>
+
+                <form action="{% url 'turfs:toggle_emergency' turf.id %}" method="post" class="flex flex-col gap-4">
+                    {% csrf_token %}
+                    {% if turf.emergency_block.is_blocked %}
+                    <button type="submit"
+                        class="bg-white text-gray-900 font-black py-4 rounded-2xl hover:bg-gray-100 transition">
+                        Deactivate Emergency Block
+                    </button>
+                    {% else %}
+                    <input type="text" name="reason" placeholder="Event: Heavy Rain, Power Failure..."
+                        class="bg-white/10 border border-white/20 text-white px-4 py-3 rounded-xl text-sm focus:ring-2 focus:ring-red-500 outline-none">
+                    <button type="submit"
+                        class="bg-red-600 hover:bg-red-700 text-white font-black py-4 rounded-2xl transition shadow-lg shadow-red-900/50">
+                        Activate Emergency Stop
+                    </button>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+        <!-- Weekly Availability -->
+        <div class="lg:col-span-1 border border-gray-100 rounded-3xl p-8 bg-white shadow-sm h-fit">
+            <h3 class="text-lg font-black text-gray-900 mb-6 flex items-center gap-2">
+                <i class="fas fa-calendar-alt text-brand-600"></i> Weekly Schedule
+            </h3>
+            <div class="space-y-4">
+                {% for day in week_days %}
+                <form method="post" class="flex items-center justify-between p-4 bg-gray-50 rounded-2xl">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="update_day">
+                    <input type="hidden" name="day_of_week" value="{{ day.id }}">
+                    <span class="font-bold text-gray-700">{{ day.name }}</span>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" name="is_open" {% if day.is_open %}checked{% endif %}
+                            class="sr-only peer" onchange="this.form.submit()">
+                        <div
+                            class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-600">
+                        </div>
+                    </label>
+                </form>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Custom Slot Management -->
+        <div class="lg:col-span-2 space-y-10">
+            <!-- Slots Grid -->
+            <div class="bg-white border border-gray-100 rounded-3xl p-8 shadow-sm">
+                <div class="flex flex-col md:flex-row justify-between md:items-center mb-8 gap-4">
+                    <div>
+                        <h3 class="text-lg font-black text-gray-900">Manage Individual Slots</h3>
+                        <p class="text-gray-500 text-sm mt-1">Disable specific hours for private coaching or
+                            maintenance.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                    {% for slot in slots %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="toggle_slot">
+                        <input type="hidden" name="start_time" value="{{ slot.start|time:'H:i' }}">
+                        <input type="hidden" name="end_time" value="{{ slot.end|time:'H:i' }}">
+                        <button type="submit" name="is_enabled"
+                            value="{% if slot.is_enabled %}off{% else %}on{% endif %}"
+                            class="w-full h-24 flex flex-col items-center justify-center rounded-2xl border-2 transition-all p-4 group
+                            {% if slot.is_enabled %} bg-white border-gray-100 hover:border-brand-500 hover:bg-brand-50 {% else %} bg-gray-100 border-gray-200 text-gray-400 {% endif %}">
+                            <input type="hidden" name="is_enabled"
+                                value="{% if slot.is_enabled %}off{% else %}on{% endif %}">
+                            <span class="text-base font-black {% if slot.is_enabled %}text-gray-900{% endif %}">
+                                {{ slot.start|date:"g:i A" }}
+                            </span>
+                            <span class="text-[9px] uppercase font-bold tracking-widest opacity-60">
+                                to {{ slot.end|date:"g:i A" }}
+                            </span>
+                            <span
+                                class="mt-2 text-[9px] font-black uppercase tracking-tighter {% if slot.is_enabled %}text-green-600{% else %}text-red-400{% endif %}">
+                                {% if slot.is_enabled %}
+                                <i class="fas fa-eye mr-1"></i> Visible
+                                {% else %}
+                                <i class="fas fa-eye-slash mr-1"></i> Hidden
+                                {% endif %}
+                            </span>
+                        </button>
+                    </form>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Planned Closures -->
+            <div class="bg-white border border-gray-100 rounded-3xl p-8 shadow-sm">
+                <h3 class="text-lg font-black text-gray-900 mb-6 flex items-center gap-2">
+                    <i class="fas fa-business-time text-brand-600"></i> Scheduled Long-term Closures
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Add Logic -->
+                    <div>
+                        <h4 class="text-sm font-bold text-gray-700 mb-4 uppercase tracking-widest">Plan New Closure</h4>
+                        <form method="post" class="space-y-4">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="add_closure">
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-bold text-gray-500 uppercase">Start Date</label>
+                                    <input type="date" name="start_date" required
+                                        class="w-full bg-gray-50 border border-gray-100 px-3 py-2 rounded-xl text-sm">
+                                </div>
+                                <div class="space-y-1">
+                                    <label class="text-[10px] font-bold text-gray-500 uppercase">End Date</label>
+                                    <input type="date" name="end_date" required
+                                        class="w-full bg-gray-50 border border-gray-100 px-3 py-2 rounded-xl text-sm">
+                                </div>
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[10px] font-bold text-gray-500 uppercase">Reason</label>
+                                <input type="text" name="reason" placeholder="e.g. Annual Maintenance, Private Event"
+                                    required
+                                    class="w-full bg-gray-50 border border-gray-100 px-3 py-3 rounded-xl text-sm">
+                            </div>
+                            <button type="submit"
+                                class="w-full bg-gray-900 text-white font-bold py-3 rounded-xl hover:bg-black transition">
+                                Block Calendar Period
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Active Closures -->
+                    <div>
+                        <h4 class="text-sm font-bold text-gray-700 mb-4 uppercase tracking-widest">Upcoming Blocks</h4>
+                        <div class="space-y-3">
+                            {% for closure in closures %}
+                            <div
+                                class="p-4 bg-indigo-50 border border-indigo-100 rounded-2xl flex justify-between items-center group">
+                                <div>
+                                    <p class="text-sm font-bold text-indigo-900">{{ closure.reason }}</p>
+                                    <p class="text-[10px] text-indigo-600 mt-1 uppercase font-black tracking-widest">
+                                        {{ closure.start_date|date:"M j" }} → {{ closure.end_date|date:"M j" }}
+                                    </p>
+                                </div>
+                                <i
+                                    class="fas fa-calendar-times text-indigo-200 group-hover:text-indigo-400 transition"></i>
+                            </div>
+                            {% empty %}
+                            <div class="p-8 text-center bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                                <p class="text-gray-400 text-xs">No scheduled closures.</p>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

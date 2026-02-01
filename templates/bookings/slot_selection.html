@@ -15,6 +15,16 @@
             </p>
         </div>
         <div class="p-8">
+            {% if not is_date_avail %}
+            <div class="mb-10 p-6 bg-red-50 border-2 border-red-200 rounded-3xl flex items-center gap-4 text-red-700">
+                <i class="fas fa-exclamation-triangle text-2xl"></i>
+                <div>
+                    <h3 class="font-bold text-lg">Venue Unavailable</h3>
+                    <p class="text-sm opacity-90">{{ closed_reason }}</p>
+                </div>
+            </div>
+            {% endif %}
+
             <div class="flex items-center gap-6 mb-8 p-4 bg-gray-50 rounded-2xl">
                 <div class="flex items-center gap-2">
                     <div class="w-4 h-4 bg-indigo-600 rounded-md"></div>
@@ -22,30 +32,33 @@
                 </div>
                 <div class="flex items-center gap-2">
                     <div class="w-4 h-4 bg-gray-200 rounded-md"></div>
-                    <span class="text-sm text-gray-600 font-medium">Booked</span>
+                    <span class="text-sm text-gray-600 font-medium">Booked / Unavailable</span>
                 </div>
                 <div class="ml-auto text-indigo-600 font-bold">Price: ₹{{ turf.price_per_hour }}/hour</div>
             </div>
             <form method="post" class="space-y-10">
                 {% csrf_token %}
-                <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-4">
+                <div class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
                     {% for slot in slots %}
+                    {% if slot.is_enabled and not slot.is_booked %}
                     <label class="relative group">
-                        {% if slot.is_booked %}
-                        <input type="radio" name="start_time" value="{{ slot.start|time:'H:i' }}" disabled
-                            class="peer absolute opacity-0 w-full h-full cursor-pointer z-10">
-                        {% else %}
                         <input type="radio" name="start_time" value="{{ slot.start|time:'H:i' }}"
                             class="peer absolute opacity-0 w-full h-full cursor-pointer z-10" required>
-                        {% endif %}
                         <div
-                            class="h-20 flex flex-col items-center justify-center rounded-2xl border-2 transition-all duration-200 {% if slot.is_booked %} bg-gray-100 border-gray-100 text-gray-400 cursor-not-allowed {% else %} border-gray-100 group-hover:border-indigo-200 peer-checked:bg-indigo-600 peer-checked:border-indigo-600 peer-checked:text-white peer-checked:shadow-lg {% endif %}">
-                            <span class="text-lg font-bold">{{ slot.start|time:"H:i" }}</span>
-                            <span class="text-[10px] uppercase font-bold tracking-widest opacity-60">
-                                to {{ slot.end|time:"H:i" }}
-                            </span>
+                            class="h-20 flex flex-col items-center justify-center rounded-2xl border-2 border-gray-100 transition-all duration-200 group-hover:border-brand-200 peer-checked:bg-gray-900 peer-checked:border-gray-900 peer-checked:text-white peer-checked:shadow-xl touch-active">
+                            <span class="text-base font-black">{{ slot.start|date:"g:i" }}</span>
+                            <span class="text-[9px] uppercase font-bold tracking-widest opacity-60">{{
+                                slot.start|date:"A" }}</span>
                         </div>
                     </label>
+                    {% else %}
+                    <!-- Hidden/Disabled Slot (UX: Don't show noise) -->
+                    <div
+                        class="h-20 flex flex-col items-center justify-center rounded-2xl bg-gray-50 border-2 border-transparent text-gray-300 pointer-events-none">
+                        <span class="text-sm font-bold">{{ slot.start|date:"g:i" }}</span>
+                        <i class="fas fa-lock text-[10px] mt-1"></i>
+                    </div>
+                    {% endif %}
                     {% endfor %}
                 </div>
                 <div class="flex items-center justify-between pt-8 border-t border-gray-100">

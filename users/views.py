@@ -35,6 +35,17 @@ def verify_otp_view(request):
         otp_input = request.POST.get('otp')
         try:
             user = User.objects.get(id=user_id)
+            
+            # CRITICAL SECURITY: Check OTP expiration (10 minutes)
+            if user.otp_created_at:
+                from datetime import timedelta
+                otp_age = timezone.now() - user.otp_created_at
+                if otp_age > timedelta(minutes=10):
+                    user.otp = None  # Invalidate expired OTP
+                    user.save()
+                    messages.error(request, "OTP expired. Please request a new one.")
+                    return redirect('users:login')
+            
             if user.otp == otp_input:
                 user.otp = None 
                 user.save()
@@ -75,6 +86,7 @@ from core.utils.geo import GoogleMapsParser
 def register_as_owner(request):
     if request.method == 'POST':
         # 1. Collect Form Data
+        owner_name = request.POST.get('owner_name', '')
         business_name = request.POST.get('business_name')
         contact_email = request.POST.get('contact_email')
         city = request.POST.get('city')
@@ -82,7 +94,7 @@ def register_as_owner(request):
         zip_code = request.POST.get('zip_code')
         
         # New Turf Fields
-        description = request.POST.get('description')
+        description = request.POST.get('description', '')
         price_per_hour = request.POST.get('price_per_hour')
         map_share_url = request.POST.get('map_share_url')
         sport_ids = request.POST.getlist('sports')
@@ -97,7 +109,7 @@ def register_as_owner(request):
             latitude, longitude = GoogleMapsParser.extract_lat_lon(map_share_url)
             
             if latitude is None or longitude is None:
-                messages.error(request, "Could not extract coordinates from the provided link. Please ensure you dropped a pin before sharing.")
+                messages.error(request, "Could not automatically detect coordinates. Please drop a specific pin on the map location and share that link.")
                 return render(request, 'users/register_owner.html', {'sports': SportType.objects.all(), 'form_data': request.POST})
 
         with transaction.atomic():
@@ -111,6 +123,7 @@ def register_as_owner(request):
             TurfOwnerProfile.objects.update_or_create(
                 user=request.user,
                 defaults={
+                    'owner_name': owner_name,
                     'business_name': business_name,
                     'contact_email': contact_email,
                     'city': city,
@@ -137,8 +150,8 @@ def register_as_owner(request):
             if sport_ids:
                 turf.sports.set(sport_ids)
 
-            # 6. Handle Media Uploads
-            # Images
+            # 6. Handle Image Uploads (NO VIDEO in application form)
+            # Videos can be added post-approval in the owner dashboard
             images = request.FILES.getlist('images')
             for i, image in enumerate(images):
                 TurfImage.objects.create(
@@ -146,16 +159,8 @@ def register_as_owner(request):
                     image=image,
                     is_cover=(i == 0) # First image as cover
                 )
-            
-            # Video
-            video = request.FILES.get('video')
-            if video:
-                TurfVideo.objects.create(
-                    turf=turf,
-                    video=video
-                )
         
-        messages.success(request, f"Application submitted! Extracted location: {latitude}, {longitude}")
+        messages.success(request, "Application submitted successfully! Our team will review your details and contact you within 24-48 hours.")
         return redirect('users:dashboard')
     
     sports = SportType.objects.all()

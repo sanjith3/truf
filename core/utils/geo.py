@@ -30,8 +30,11 @@ class GoogleMapsParser:
         if "goo.gl" in url or "maps.app.goo.gl" in url:
             try:
                 # We only need the headers to find the redirect location
-                request = urllib.request.Request(url, method='HEAD')
-                with urllib.request.urlopen(request, timeout=5) as response:
+                # CRITICAL: Google blocks default python user-agents, so we must spoof a browser.
+                headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+                request = urllib.request.Request(url, headers=headers, method='HEAD')
+                
+                with urllib.request.urlopen(request, timeout=10) as response:
                     url = response.geturl()
             except Exception as e:
                 # If we can't follow redirect, we can't parse short URLs

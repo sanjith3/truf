@@ -119,6 +119,11 @@
                 </div>
 
                 <div class="flex items-center gap-3 flex-shrink-0">
+                    <a href="{% url 'turfs:operations' turf.id %}"
+                        class="p-3 text-indigo-600 hover:text-white bg-indigo-50 hover:bg-indigo-600 rounded-xl transition"
+                        title="Manage Operations">
+                        <i class="fas fa-sliders-h"></i>
+                    </a>
                     <a href="{% url 'turfs:manage_images' turf.id %}"
                         class="p-3 text-gray-500 hover:text-indigo-600 bg-gray-100 hover:bg-indigo-50 rounded-xl transition"
                         title="Manage Photos">
@@ -130,8 +135,8 @@
                         <i class="fas fa-edit"></i>
                     </a>
                     <a href="{% url 'turfs:detail' turf.id %}"
-                        class="px-6 py-3 bg-indigo-50 text-indigo-700 font-bold rounded-xl hover:bg-indigo-100 transition whitespace-nowrap">
-                        View Public Page
+                        class="px-6 py-3 bg-gray-900 text-white font-bold rounded-xl hover:bg-black transition whitespace-nowrap">
+                        View Page
                     </a>
                 </div>
             </div>
@@ -151,6 +156,32 @@
             {% endfor %}
         </div>
     </div>
+    {% if ads_enabled %}
+    <!-- Ad Campaigns Section (Only if enabled) -->
+    <div class="mb-10">
+        <div
+            class="bg-gradient-to-r from-rose-500 to-rose-600 rounded-3xl p-8 text-white shadow-xl shadow-rose-200 overflow-hidden relative group">
+            <div class="absolute right-0 top-0 p-8 opacity-10 transform group-hover:scale-110 transition duration-500">
+                <i class="fas fa-ad text-9xl"></i>
+            </div>
+            <div class="relative z-10 max-w-2xl">
+                <h3 class="text-2xl font-black mb-2">Boost Your Visibility</h3>
+                <p class="text-rose-100 mb-6">Reach more players by launching targeted ad campaigns. Show your turf at
+                    the top of search results and on the home page.</p>
+                <div class="flex gap-4">
+                    <a href="{% url 'ads:create' %}"
+                        class="bg-white text-rose-600 px-6 py-3 rounded-xl font-bold hover:bg-rose-50 transition">
+                        Start Campaign
+                    </a>
+                    <a href="{% url 'ads:dashboard' %}"
+                        class="bg-rose-400/30 text-white border border-rose-400 px-6 py-3 rounded-xl font-bold hover:bg-rose-400/50 transition">
+                        View Analytics
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
     {% endif %}
 </div>
 {% endblock %}

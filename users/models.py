@@ -82,6 +82,7 @@ class CustomUser(AbstractUser):
 
 class TurfOwnerProfile(models.Model):
     user = models.OneToOneField(CustomUser, on_delete=models.CASCADE, related_name='owner_profile')
+    owner_name = models.CharField(max_length=100, blank=True, help_text="Full name of the owner")
     business_name = models.CharField(max_length=100)
     contact_email = models.EmailField()
     alternate_phone = models.CharField(max_length=15, blank=True)

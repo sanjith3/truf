@@ -1,129 +1,248 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="max-w-xl mx-auto py-12 px-4">
-    <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
-        <div class="bg-indigo-900 p-8 text-white text-center">
-            <i class="fas fa-handshake fa-4x mb-4 text-brand-400"></i>
-            <h1 class="text-3xl font-bold">Partner with TurfSpot</h1>
-            <p class="text-indigo-200 mt-2">Grow your business with the #1 Booking Platform</p>
+<div class="max-w-3xl mx-auto py-12 px-4">
+    <div class="bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-100">
+
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-gray-900 to-gray-800 p-10 text-white text-center relative overflow-hidden">
+            <div class="absolute top-0 right-0 opacity-10">
+                <i class="fas fa-handshake fa-9x"></i>
+            </div>
+            <div class="relative z-10">
+                <i class="fas fa-handshake fa-4x mb-4 text-brand-500"></i>
+                <h1 class="text-4xl font-black mb-2">Become a TurfSpot Partner</h1>
+                <p class="text-gray-300 text-lg">Join India's fastest-growing sports booking platform</p>
+            </div>
         </div>
-        <div class="p-8">
-            <h3 class="text-xl font-bold text-gray-800 mb-6">Business Details</h3>
-            <form method="post" enctype="multipart/form-data" class="space-y-6">
+
+        <!-- Form Container -->
+        <div class="p-8 md:p-10">
+
+            <!-- Introduction -->
+            <div class="bg-brand-50 border-l-4 border-brand-500 p-6 rounded-r-2xl mb-8">
+                <p class="text-gray-700 leading-relaxed">
+                    <strong class="text-gray-900">Quick Application:</strong> Fill in your basic details to apply as a
+                    partner.
+                    After approval, you'll get access to your dashboard where you can manage slots, schedules, and
+                    bookings.
+                </p>
+            </div>
+
+            <form method="post" enctype="multipart/form-data" class="space-y-8" id="partnerForm">
                 {% csrf_token %}
+
+                <!-- SECTION 1: Owner Details -->
                 <div class="space-y-6">
+                    <h3
+                        class="text-xl font-black text-gray-900 flex items-center gap-3 pb-3 border-b-2 border-gray-100">
+                        <span
+                            class="w-8 h-8 bg-brand-500 text-white rounded-full flex items-center justify-center text-sm font-black">1</span>
+                        Your Contact Details
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Owner Full Name *</label>
+                            <input type="text" name="owner_name" required placeholder="e.g. Rajesh Kumar"
+                                class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">Phone Number *</label>
+                            <input type="tel" name="phone_number" required value="{{ user.phone_number }}" readonly
+                                class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 bg-gray-50 text-gray-600 cursor-not-allowed">
+                            <p class="text-xs text-gray-500 mt-1">Your verified number</p>
+                        </div>
+                    </div>
+
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Business / Turf Name</label>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Official Email Address *</label>
+                        <input type="email" name="contact_email" required placeholder="contact@yourturf.com"
+                            class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+                        <p class="text-xs text-gray-500 mt-1">Used for approval updates and important notifications</p>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: Turf/Business Details -->
+                <div class="space-y-6">
+                    <h3
+                        class="text-xl font-black text-gray-900 flex items-center gap-3 pb-3 border-b-2 border-gray-100">
+                        <span
+                            class="w-8 h-8 bg-brand-500 text-white rounded-full flex items-center justify-center text-sm font-black">2</span>
+                        Turf / Business Details
+                    </h3>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Business / Turf Name *</label>
                         <input type="text" name="business_name" required placeholder="e.g. KickOff Arena"
-                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition">
+                            class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
                     </div>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Official Email</label>
-                            <input type="email" name="contact_email" required placeholder="contact@yourturf.com"
-                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition">
-                        </div>
-                        <div>
-                            <label class="block text-sm font-bold text-gray-700 mb-1">Price per Hour (₹)</label>
-                            <input type="number" name="price_per_hour" required placeholder="800"
-                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition">
-                        </div>
-                    </div>
+
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-1">Turf Description</label>
-                        <textarea name="description" rows="3" required
-                            placeholder="Describe your turf, amenities, rules..."
-                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"></textarea>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Price per Hour (₹) *</label>
+                        <input type="number" name="price_per_hour" required min="100" step="50" placeholder="800"
+                            class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
+                        <p class="text-xs text-gray-500 mt-1">You can update pricing anytime from your dashboard</p>
                     </div>
+
                     <div>
-                        <label class="block text-sm font-bold text-gray-700 mb-3">Sports Available</label>
-                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Sports Available *</label>
+                        <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                             {% for sport in sports %}
                             <label
-                                class="relative flex items-center p-3 rounded-xl border border-gray-200 hover:bg-gray-50 cursor-pointer transition">
+                                class="relative flex items-center p-4 rounded-xl border-2 border-gray-200 hover:border-brand-300 hover:bg-brand-50 cursor-pointer transition group">
                                 <input type="checkbox" name="sports" value="{{ sport.id }}"
-                                    class="w-4 h-4 text-brand-600 border-gray-300 rounded focus:ring-brand-500">
-                                <span class="ml-3 text-sm font-medium text-gray-700 flex items-center gap-2">
+                                    class="w-5 h-5 text-brand-600 border-gray-300 rounded focus:ring-brand-500">
+                                <span
+                                    class="ml-3 text-sm font-bold text-gray-700 group-hover:text-brand-700 flex items-center gap-2">
                                     {% if sport.icon %}
-                                    <i class="fas {{ sport.icon }} text-brand-500 w-5"></i>
+                                    <i class="fas {{ sport.icon }} text-brand-500"></i>
                                     {% endif %}
                                     {{ sport.name }}
                                 </span>
                             </label>
                             {% endfor %}
                         </div>
+                        <p class="text-xs text-gray-500 mt-2">Select all sports available at your turf</p>
                     </div>
-                    <div class="border-t border-gray-100 pt-6">
-                        <h4 class="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
-                            <i class="fas fa-map-marker-alt text-brand-500"></i> Location Details
-                        </h4>
-                        <div class="grid grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
-                                <input type="text" name="city" required placeholder="e.g. Kochi"
-                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">ZIP / PIN</label>
-                                <input type="text" name="zip_code" required placeholder="682001"
-                                    class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition">
-                            </div>
+                </div>
+
+                <!-- SECTION 3: Turf Description -->
+                <div class="space-y-6">
+                    <h3
+                        class="text-xl font-black text-gray-900 flex items-center gap-3 pb-3 border-b-2 border-gray-100">
+                        <span
+                            class="w-8 h-8 bg-brand-500 text-white rounded-full flex items-center justify-center text-sm font-black">3</span>
+                        Turf Description
+                    </h3>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Describe Your Turf</label>
+                        <textarea name="description" rows="4"
+                            placeholder="FIFA-size football turf with night lights, parking available. Rules: Non-marking shoes only."
+                            class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"></textarea>
+                        <p class="text-xs text-gray-500 mt-1">Optional but recommended – helps users understand your
+                            facility</p>
+                    </div>
+                </div>
+
+                <!-- SECTION 4: Location Details -->
+                <div class="space-y-6">
+                    <h3
+                        class="text-xl font-black text-gray-900 flex items-center gap-3 pb-3 border-b-2 border-gray-100">
+                        <span
+                            class="w-8 h-8 bg-brand-500 text-white rounded-full flex items-center justify-center text-sm font-black">4</span>
+                        Location Details
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">City *</label>
+                            <input type="text" name="city" required placeholder="e.g. Kochi"
+                                class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
                         </div>
-                        <div class="mb-4">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Full Address</label>
-                            <textarea name="address" rows="2" required placeholder="Street name, landmark..."
-                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition"></textarea>
-                        </div>
-                        <div class="mt-4 bg-gray-50 p-4 rounded-xl border border-gray-100">
-                            <label class="block text-sm font-bold text-gray-700 mb-2">Google Maps Location Link</label>
-                            <input type="url" name="map_share_url" required placeholder="https://maps.google.com/..."
-                                class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:ring-2 focus:ring-brand-500 focus:border-transparent outline-none transition mb-3">
-                            <div class="space-y-2">
-                                <p class="text-[11px] text-gray-500 flex items-center gap-2">
-                                    <i class="fas fa-info-circle text-brand-500"></i>
-                                    <strong>How to get this?</strong>
-                                </p>
-                                <p class="text-[11px] text-gray-600 leading-tight">
-                                    Open Google Maps &rarr; Drop a pin on your turf &rarr; Click "Share" &rarr; "Copy
-                                    link" &rarr; Paste here.
-                                </p>
-                            </div>
+
+                        <div>
+                            <label class="block text-sm font-bold text-gray-700 mb-2">ZIP / PIN Code *</label>
+                            <input type="text" name="zip_code" required pattern="[0-9]{6}" placeholder="682001"
+                                class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition">
                         </div>
                     </div>
-                    <div class="border-t border-gray-100 pt-6">
-                        <h4 class="text-sm font-bold text-gray-900 mb-4 flex items-center gap-2">
-                            <i class="fas fa-camera text-brand-500"></i> Media Uploads
-                        </h4>
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Turf Photos
-                                    (Multiple)</label>
-                                <input type="file" name="images" multiple accept="image/*" required
-                                    class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-brand-50 file:text-brand-700 hover:file:bg-brand-100 cursor-pointer">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Promotional Video (Max
-                                    15s)</label>
-                                <input type="file" name="video" accept="video/*"
-                                    class="w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 cursor-pointer">
-                                <p class="text-[10px] text-gray-400 mt-1 uppercase font-bold tracking-wider">Videos
-                                    longer than 15s will be rejected</p>
-                            </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-2">Full Address *</label>
+                        <textarea name="address" rows="2" required placeholder="Street name, landmark, area..."
+                            class="w-full px-4 py-3 rounded-xl border-2 border-gray-200 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition"></textarea>
+                    </div>
+
+                    <div class="bg-gray-50 p-6 rounded-2xl border-2 border-gray-200">
+                        <label class="block text-sm font-bold text-gray-700 mb-3 flex items-center gap-2">
+                            <i class="fas fa-map-marker-alt text-brand-500"></i>
+                            Google Maps Location Link *
+                        </label>
+                        <input type="url" name="map_share_url" required placeholder="https://maps.google.com/..."
+                            class="w-full px-4 py-3 rounded-xl border-2 border-gray-300 focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition mb-3">
+
+                        <div class="bg-white p-4 rounded-xl border border-gray-200">
+                            <p class="text-xs text-gray-600 font-bold mb-2 flex items-center gap-2">
+                                <i class="fas fa-info-circle text-brand-500"></i>
+                                How to get this link?
+                            </p>
+                            <ol class="text-xs text-gray-600 space-y-1 ml-5 list-decimal">
+                                <li>Open Google Maps on your phone or computer</li>
+                                <li>Search for your turf or drop a pin on the exact location</li>
+                                <li>Tap/Click "Share" button</li>
+                                <li>Copy the link and paste it here</li>
+                            </ol>
                         </div>
                     </div>
                 </div>
-                <div class="bg-indigo-50 p-4 rounded-xl mt-8">
-                    <p class="text-sm text-indigo-800 font-medium">
-                        By registering, you request access to the Partner Dashboard for <strong>{{ user.phone_number
-                            }}</strong>.
+
+                <!-- SECTION 5: Media Upload -->
+                <div class="space-y-6">
+                    <h3
+                        class="text-xl font-black text-gray-900 flex items-center gap-3 pb-3 border-b-2 border-gray-100">
+                        <span
+                            class="w-8 h-8 bg-brand-500 text-white rounded-full flex items-center justify-center text-sm font-black">5</span>
+                        Turf Photos
+                    </h3>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-3">Upload Clear Photos of Your Turf
+                            *</label>
+                        <input type="file" name="images" multiple accept="image/*" required
+                            class="w-full text-sm text-gray-600 file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:text-sm file:font-bold file:bg-brand-500 file:text-white hover:file:bg-brand-600 cursor-pointer transition">
+                        <p class="text-xs text-gray-500 mt-2">
+                            <i class="fas fa-lightbulb text-amber-500"></i>
+                            <strong>Tip:</strong> Upload at least 3 high-quality photos showing the playing area,
+                            facilities, and parking
+                        </p>
+                    </div>
+                </div>
+
+                <!-- SECTION 6: Confirmation -->
+                <div class="space-y-6">
+                    <h3
+                        class="text-xl font-black text-gray-900 flex items-center gap-3 pb-3 border-b-2 border-gray-100">
+                        <span
+                            class="w-8 h-8 bg-brand-500 text-white rounded-full flex items-center justify-center text-sm font-black">6</span>
+                        Confirmation
+                    </h3>
+
+                    <div class="bg-gray-50 p-6 rounded-2xl border-2 border-gray-200">
+                        <label class="flex items-start gap-3 cursor-pointer group">
+                            <input type="checkbox" name="agreement" required
+                                class="w-5 h-5 mt-1 text-brand-600 border-gray-300 rounded focus:ring-brand-500">
+                            <span class="text-sm text-gray-700 leading-relaxed">
+                                I confirm that I own or manage this turf and all the information provided is accurate.
+                                I understand that my application will be reviewed by the TurfSpot team before approval.
+                            </span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="pt-6">
+                    <button type="submit" id="submitBtn"
+                        class="w-full bg-gradient-to-r from-brand-600 to-brand-700 hover:from-brand-700 hover:to-brand-800 text-white font-black py-5 rounded-2xl shadow-2xl transition transform hover:-translate-y-1 hover:shadow-brand-500/50 flex items-center justify-center gap-3 text-lg">
+                        <i class="fas fa-paper-plane"></i>
+                        <span>Submit Partner Application</span>
+                    </button>
+                    <p class="text-center text-xs text-gray-500 mt-4">
+                        Our team will review your application within 24-48 hours
                     </p>
                 </div>
-                <button type="submit"
-                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 rounded-xl shadow-lg transition transform hover:-translate-y-1 mt-6">
-                    Submit Application
-                </button>
             </form>
         </div>
     </div>
 </div>
+
+<script>
+    // Prevent double submission
+    document.getElementById('partnerForm').addEventListener('submit', function (e) {
+        const btn = document.getElementById('submitBtn');
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Submitting Application...</span>';
+    });
+</script>
 {% endblock %}

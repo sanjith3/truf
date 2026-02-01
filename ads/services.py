@@ -13,6 +13,10 @@ class AdService:
         - Schedule (Start/End date)
         - Budget (Spent < Total)
         """
+        from core.models import PlatformSettings
+        if not PlatformSettings.get_settings().ads_enabled:
+            return AdCampaign.objects.none()
+
         now = timezone.now()
         
         # Core eligibility filters

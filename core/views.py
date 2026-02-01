@@ -234,31 +234,70 @@ def review_owner_application(request, user_id):
         'title': f'Review Application - {owner.owner_profile.business_name}',
         'formatted_date': formatted_date,
     }
-    return render(request, 'admin/reports/review_application.html', context)
+    return render(request, 'platform_admin/partner_application_review.html', context)
 
 @user_passes_test(lambda u: u.is_staff)
 def approve_owner(request, user_id):
+    """Approve turf owner application with audit logging"""
     if request.method == 'POST':
-        user = get_object_or_404(CustomUser, id=user_id)
-        user.is_owner_approved = True
-        user.save()
+        from django.db import transaction
+        from .models import AdminActionLog
         
-        # Activate all their turfs
-        user.turfs.all().update(is_active=True)
+        with transaction.atomic():
+            user = get_object_or_404(CustomUser, id=user_id)
+            business_name = user.owner_profile.business_name
+            
+            # Approve owner
+            user.is_owner_approved = True
+            user.save()
+            
+            # Activate all their turfs
+            turf_count = user.turfs.all().update(is_active=True)
+            
+            # Create audit log
+            AdminActionLog.objects.create(
+                admin_user=request.user,
+                action='OWNER_APPROVED',
+                target_user=user,
+                reason=f"Approved {business_name} with {turf_count} turf(s)"
+            )
         
-        messages.success(request, f'Successfully approved {user.owner_profile.business_name}. Their turf is now live!')
+        messages.success(
+            request, 
+            f'✅ Successfully approved {business_name}! Their turf is now live and visible to users.'
+        )
         return redirect('core:admin_pending_owners')
     
     return redirect('core:admin_pending_owners')
 
 @user_passes_test(lambda u: u.is_staff)
 def reject_owner(request, user_id):
+    """Reject turf owner application with audit logging"""
     if request.method == 'POST':
-        user = get_object_or_404(CustomUser, id=user_id)
-        business_name = user.owner_profile.business_name
-        user.delete()
+        from django.db import transaction
+        from .models import AdminActionLog
         
-        messages.warning(request, f'Rejected application from {business_name}. All data has been removed.')
+        reason = request.POST.get('reason', 'No reason provided')
+        
+        with transaction.atomic():
+            user = get_object_or_404(CustomUser, id=user_id)
+            business_name = user.owner_profile.business_name
+            
+            # Create audit log BEFORE deletion
+            AdminActionLog.objects.create(
+                admin_user=request.user,
+                action='OWNER_REJECTED',
+                target_user=None,  # Will be deleted
+                reason=f"Rejected {business_name}: {reason}"
+            )
+            
+            # Delete user and all related data (cascade)
+            user.delete()
+        
+        messages.warning(
+            request, 
+            f'❌ Rejected application from {business_name}. Reason: {reason}'
+        )
         return redirect('core:admin_pending_owners')
     
     return redirect('core:admin_pending_owners')
